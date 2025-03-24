@@ -65,7 +65,7 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('assets/logo.jpg',
+                  Image.asset('../../assets/logo.jpg',
                       height: 200), // ✅ Replace with your logo
                   SizedBox(
                     height: 50,
