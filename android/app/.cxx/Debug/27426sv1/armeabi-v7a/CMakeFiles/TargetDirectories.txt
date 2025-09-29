@@ -1,0 +1,2 @@
+/Users/melizaaspiras/AndroidStudioProjects/appointment-room/android/app/.cxx/Debug/27426sv1/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/melizaaspiras/AndroidStudioProjects/appointment-room/android/app/.cxx/Debug/27426sv1/armeabi-v7a/CMakeFiles/rebuild_cache.dir
