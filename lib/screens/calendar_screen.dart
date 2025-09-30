@@ -23,10 +23,10 @@ class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
 
   @override
-  _CalendarScreenState createState() => _CalendarScreenState();
+  CalendarScreenState createState() => CalendarScreenState();
 }
 
-class _CalendarScreenState extends State<CalendarScreen> {
+class CalendarScreenState extends State<CalendarScreen> {
   // final ReservationController reservationController = Get.find();
   // late Worker _reservationListener;
   bool isLoading = true;
@@ -48,7 +48,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     context.read<ReservationBloc>().add(FetchReservationsEvent());
     context.read<RoomBloc>().add(FetchRooms());
     // _loadEvents();
-    //
+    //r
     // _reservationListener = ever(reservationController.reservationList, (_) {
     //   if (mounted) _loadEvents();
     // });
@@ -138,16 +138,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Calendar"),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 15),
-            child: GestureDetector(
-                onTap: () {
-                  scrollToToday();
-                },
-                child: Text(StringUtils.goToToday)),
-          )
-        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => chooseAddCalendarBottomSheet(context),

@@ -1,5 +1,4 @@
 class StringUtils {
-
   /// calendar screen
   static final rooms = 'Rooms';
   static final goToToday = 'Go To Today';
@@ -51,7 +50,8 @@ class StringUtils {
   static const thisMonth = 'This Month';
   static const custom = 'Custom';
 
-  static const noReservationsFound = 'No reservations found for selected filter.';
+  static const noReservationsFound =
+      'No reservations found for selected filter.';
   static const noReservationsFound2 = 'No reservations found.';
 
   /// User screen
@@ -80,6 +80,7 @@ class StringUtils {
 
   /// Settings screen
   static const settings = 'Settings';
+  static const more = 'More';
   static const darkMode = 'Dark Mode';
 
   static const resetAll = 'Reset Entire Database';
@@ -155,7 +156,8 @@ class StringUtils {
   static const enterDiscount = 'Enter discount';
   static const enterPrepayment = 'Enter prepayment';
   static const attention = 'Attention';
-  static const dateError = 'The date of Check-in must be less than the date of Check-out!';
+  static const dateError =
+      'The date of Check-in must be less than the date of Check-out!';
   static const overlapDateError = 'Check-in or Check-out date already exist.';
   static const updateReservation = 'Update Reservation';
 
@@ -170,9 +172,8 @@ class StringUtils {
   /// reservation card view
   static const rateNight = '"Rate / Night"';
   static const deleteReservationTitle = 'Delete Reservation';
-  static const deleteReservationMessage = 'Are you sure you want to delete this reservation?';
+  static const deleteReservationMessage =
+      'Are you sure you want to delete this reservation?';
   static const yes = 'Yes';
   static const no = 'No';
-
-
 }

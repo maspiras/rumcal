@@ -1,10 +1,12 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:cal_room/screens/account_screen.dart';
+import 'package:cal_room/screens/app_settings_screen.dart';
+import 'package:cal_room/screens/rate_app_screen.dart';
 import 'package:cal_room/screens/reservation_screen.dart';
 import 'package:cal_room/screens/search_reservation.dart';
 import 'package:cal_room/screens/settings_screen.dart';
 import 'package:cal_room/screens/today_screen.dart';
-import 'package:cal_room/screens/user_screen.dart';
 import 'package:cal_room/utils/color_utils.dart';
 import 'package:cal_room/utils/string_utils.dart';
 import 'package:flutter/material.dart';
@@ -20,14 +22,21 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int currentIndex = 0;
-  final screens = [
-    CalendarScreen(),
-    TodayScreen(),
-    // RoomScreen(),
-    ReservationScreen(),
-    UserScreen(),
-    SettingsScreen(),
-  ];
+  final GlobalKey<CalendarScreenState> calendarKey =
+      GlobalKey<CalendarScreenState>();
+
+  late final List<Widget> screens;
+
+  @override
+  void initState() {
+    super.initState();
+    screens = [
+      CalendarScreen(key: calendarKey),
+      TodayScreen(),
+      ReservationScreen(),
+      SettingsScreen(),
+    ];
+  }
 
   // final BadgeController badgeController = Get.find<BadgeController>();
 
@@ -57,16 +66,17 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       extendBody: false, // Removes floating bottom bar
       appBar: AppBar(
-        leading: Icon(
-          Icons.calendar_month,
-          size: 30,
-        ),
-        // ✅ Replace with your logo
-
         title: Text(StringUtils.appTitle),
         actions: [
+          if (currentIndex == 0)
+            IconButton(
+              onPressed: () {
+                calendarKey.currentState?.scrollToToday();
+              },
+              icon: Icon(Icons.calendar_today),
+            ),
           IconButton(
-            icon: Icon(Icons.search, color: ColorUtils.white),
+            icon: Icon(Icons.search),
             onPressed: () {
               Navigator.push(
                 context,
@@ -74,10 +84,65 @@ class _MainScreenState extends State<MainScreen> {
                   builder: (context) => SearchReservation(),
                 ),
               );
-              //  showSearch(context: context, delegate: DataSearch());
             },
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: ColorUtils.blue),
+              child: Text(
+                StringUtils.appTitle,
+                style: TextStyle(
+                  color: ColorUtils.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.person, color: ColorUtils.green),
+              title: Text('My Account'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => AccountScreen()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.settings, color: ColorUtils.blue),
+              title: Text('Settings'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AppSettingsScreen()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.star, color: ColorUtils.purple),
+              title: Text('Rate the App'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => RateAppScreen()));
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.logout, color: ColorUtils.red),
+              title: Text('Logout'),
+              onTap: () {
+                Navigator.pop(context);
+                // Add logout functionality
+              },
+            ),
+          ],
+        ),
       ),
       body: screens[currentIndex],
 
@@ -103,12 +168,12 @@ class _MainScreenState extends State<MainScreen> {
             Icons.event, StringUtils.reservations,
             // badgeController.reservationsBadge.value,
           ),
+          // _buildNavItem(
+          //   Icons.person, StringUtils.users,
+          //   // badgeController.usersBadge.value,
+          // ),
           _buildNavItem(
-            Icons.person, StringUtils.users,
-            // badgeController.usersBadge.value,
-          ),
-          _buildNavItem(
-            Icons.settings, StringUtils.settings,
+            Icons.more_horiz, StringUtils.more,
             // badgeController.settingsBadge.value,
           ),
         ],
@@ -122,10 +187,25 @@ class _MainScreenState extends State<MainScreen> {
     String label,
     /* int badgeCount*/
   ) {
+    // Widget iconWidget;
+
+    // if (icon is IconData) {
+    //   iconWidget = Icon(icon, size: 28);
+    // } else if (icon is String) {
+    //   iconWidget = Image.asset(
+    //     icon,
+    //     width: 28,
+    //     height: 28,
+    //   );
+    // } else {
+    //   throw ArgumentError("icon must be IconData or String path");
+    // }
+
     return NavigationDestination(
       icon: Stack(
         clipBehavior: Clip.none,
         children: [
+          // iconWidget
           Icon(icon, size: 28),
           // if (badgeCount > 0)
           //   Positioned(
