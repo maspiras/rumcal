@@ -694,6 +694,7 @@ import 'package:cal_room/utils/color_utils.dart';
 import 'package:cal_room/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 
 import 'package:intl/intl.dart';
 
@@ -1115,17 +1116,32 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
                                         .isNotEmpty &&
                                     reservation?.id != element.id;
                               });
-
+                              // // Get.snackbar(
+                              // //   'Room is Alredy booked', '',
+                              // //   backgroundColor: ColorUtils.blue,
+                              // //   duration: Duration(seconds: 3),
+                              // //   snackPosition: SnackPosition.BOTTOM,
+                              // //   // behavior: SnackBarBehavior.floating,
+                              // // );
+                              // ScaffoldMessenger.of(context).showSnackBar(
+                              //     SnackBar(
+                              //         content: Text(StringUtils.loginSuccess)));
                               if (isContain) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(StringUtils.overlapDateError),
-                                    backgroundColor: ColorUtils.blue,
-                                    duration: Duration(seconds: 3),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
+                                Get.snackbar(
+                                  StringUtils.attention,
+                                  StringUtils.roomBooked,
+                                  backgroundColor: ColorUtils.blue,
+                                  snackPosition: SnackPosition.BOTTOM,
+                                  duration: Duration(seconds: 3),
                                 );
-
+                                // ScaffoldMessenger.of(context).showSnackBar(
+                                //   SnackBar(
+                                //     content: Text(StringUtils.overlapDateError),
+                                //     backgroundColor: ColorUtils.blue,
+                                //     duration: Duration(seconds: 3),
+                                //     behavior: SnackBarBehavior.floating,
+                                //   ),
+                                // );
                                 return;
                               }
                               setState(() => isLoading = true);
@@ -1324,19 +1340,37 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
     return Column(
       children: [
         Text(label,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: TextStyle(
+                fontSize: Get.width * 0.042, fontWeight: FontWeight.bold)),
         Row(
           children: [
             IconButton(
               onPressed: () {
-                if (count > 0) count--;
+                setState(() {
+                  if (label == StringUtils.adults && adultCount > 0) {
+                    adultCount--;
+                  } else if (label == StringUtils.children && childCount > 0) {
+                    childCount--;
+                  } else if (label == StringUtils.pets && petCount > 0) {
+                    petCount--;
+                  }
+                });
               },
               icon: Icon(Icons.remove_circle_outline, color: ColorUtils.red),
             ),
-            Text(count.toString(), style: TextStyle(fontSize: 18)),
+            Text(count.toString(),
+                style: TextStyle(fontSize: Get.width * 0.042)),
             IconButton(
               onPressed: () {
-                count++;
+                setState(() {
+                  if (label == StringUtils.adults) {
+                    adultCount++;
+                  } else if (label == StringUtils.children) {
+                    childCount++;
+                  } else if (label == StringUtils.pets) {
+                    petCount++;
+                  }
+                });
               },
               icon: Icon(Icons.add_circle_outline, color: ColorUtils.green),
             ),

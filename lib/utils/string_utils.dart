@@ -159,6 +159,7 @@ class StringUtils {
   static const dateError =
       'The date of Check-in must be less than the date of Check-out!';
   static const overlapDateError = 'Check-in or Check-out date already exist.';
+  static const roomBooked = 'This Date Room Already booked';
   static const updateReservation = 'Update Reservation';
 
   /// add/edit room bottomsheet

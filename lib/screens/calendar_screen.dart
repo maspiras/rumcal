@@ -208,7 +208,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                             GestureDetector(
                               onTap: onDateTap,
                               child: SizedBox(
-                                height: 50,
+                                height: 53,
                                 child: Column(
                                   children: [
                                     Text("${selectedMonth.year}",
@@ -231,66 +231,74 @@ class CalendarScreenState extends State<CalendarScreen> {
                                         onTap: () {
                                           showModalBottomSheet(
                                             context: context,
-                                            builder: (context) => Container(
-                                              padding: EdgeInsets.all(16),
-                                              decoration: BoxDecoration(
-                                                color: ColorUtils.white,
-                                                borderRadius:
-                                                    BorderRadius.vertical(
-                                                  top: Radius.circular(16),
-                                                ),
-                                              ),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(StringUtils.rooms),
-                                                  ListTile(
-                                                    title: Text(
-                                                      e.roomName,
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    subtitle: Text(e.roomDesc),
-                                                    trailing: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        IconButton(
-                                                          icon: Icon(Icons.edit,
-                                                              color: ColorUtils
-                                                                  .blue),
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                            addEditRoomBottomSheet(
-                                                                context,
-                                                                room: e);
-                                                          },
-                                                        ),
-                                                        IconButton(
-                                                          icon: Icon(
-                                                              Icons.delete,
-                                                              color: ColorUtils
-                                                                  .red),
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                            context
-                                                                .read<
-                                                                    RoomBloc>()
-                                                                .add(DeleteRoom(
-                                                                    e.id!));
-                                                          },
-                                                        ),
-                                                      ],
-                                                    ),
+                                            builder: (context) => SafeArea(
+                                              child: Container(
+                                                padding: EdgeInsets.all(16),
+                                                decoration: BoxDecoration(
+                                                  color: ColorUtils.white,
+                                                  borderRadius:
+                                                      BorderRadius.vertical(
+                                                    top: Radius.circular(16),
                                                   ),
-                                                ],
+                                                ),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(StringUtils.rooms),
+                                                    ListTile(
+                                                      title: Text(
+                                                        e.roomName,
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      subtitle:
+                                                          Text(e.roomDesc),
+                                                      trailing: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Icon(
+                                                                Icons.edit,
+                                                                color:
+                                                                    ColorUtils
+                                                                        .blue),
+                                                            onPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                              addEditRoomBottomSheet(
+                                                                  context,
+                                                                  room: e);
+                                                            },
+                                                          ),
+                                                          IconButton(
+                                                            icon: Icon(
+                                                                Icons.delete,
+                                                                color:
+                                                                    ColorUtils
+                                                                        .red),
+                                                            onPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                              context
+                                                                  .read<
+                                                                      RoomBloc>()
+                                                                  .add(DeleteRoom(
+                                                                      e.id!));
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           );
@@ -308,7 +316,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                                             child: Text(
                                               e.roomName,
                                               style: TextStyle(
-                                                  fontSize: 20,
+                                                  fontSize: 18,
                                                   color: ColorUtils.white),
                                             ),
                                           ),
@@ -376,7 +384,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                                             child: Column(
                                               children: [
                                                 SizedBox(
-                                                  height: 51.5,
+                                                  height: 48.5,
                                                   width: 50,
                                                   child: Column(
                                                     children: [
