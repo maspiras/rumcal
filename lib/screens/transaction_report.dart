@@ -251,12 +251,19 @@ class _TransactionScreenState extends State<TransactionScreen> {
       if (!grouped.containsKey(groupKey)) {
         grouped[groupKey] = [];
       }
+      
+      String fullname = item.fullname;
+      int maxLength = 20;
+
+      if (fullname.length > maxLength) {
+        int lastIndex = fullname.lastIndexOf(' ', maxLength);
+        fullname = fullname.substring(0, lastIndex);
+      }
 
       grouped[groupKey]!.add({
         "date": DateFormat("dd MMM yyyy").format(checkoutDate),
         "amount": (item.grandTotal as num).toDouble(),
-        "guest": item.fullname ??
-            "Guest", // Make sure `fullName` exists in your model
+        "guest": fullname , // Make sure `fullName` exists in your model
       });
     }
 
