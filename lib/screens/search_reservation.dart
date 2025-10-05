@@ -17,7 +17,7 @@ class SearchReservation extends StatelessWidget {
     return Scaffold(
       extendBody: false,
       appBar: AppBar(
-        backgroundColor: ColorUtils.blue,
+       //backgroundColor: ColorUtils.blue,
         leadingWidth: 0,
         leading: SizedBox(),
         title: Container(

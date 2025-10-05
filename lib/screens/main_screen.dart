@@ -96,7 +96,7 @@ class _MainScreenState extends State<MainScreen> {
           height: 120.0, // Set your desired height here
           child:
             DrawerHeader(
-              decoration: BoxDecoration(color: ColorUtils.blue),
+              decoration: BoxDecoration(color: Color(0xFF967969)),
               child: Text(
                 StringUtils.appTitle,
                 style: TextStyle(
