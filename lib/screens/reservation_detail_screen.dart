@@ -3,7 +3,7 @@ import '/utils/color_utils.dart';
 import '/utils/string_utils.dart';
 import '/widgets/add_edit_reservation_bottom_sheet.dart';
 import 'package:flutter/material.dart';
-import '../model/reservation_model.dart';
+import '/model/reservation_model.dart';
 
 class ReservationDetailScreen extends StatefulWidget {
   ReservationModel reservation;

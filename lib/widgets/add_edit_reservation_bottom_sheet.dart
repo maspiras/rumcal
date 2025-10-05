@@ -805,7 +805,7 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
           id: reservation!.roomId);
       calculateTotal();
     } else {
-      taxPercentController.text = "5";
+      taxPercentController.text = "0";
       rateController.text = "100"; // Default rate
       discountController.text = "0";
       prepaymentController.text = "0";
@@ -966,19 +966,19 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
                   ),
                   _buildTextField(phoneController, StringUtils.phone,
                       keyboardType: TextInputType.phone, validator: (value) {
-                    if (value!.isEmpty) {
+                    /*if (value!.isEmpty) {
                       return StringUtils.enterMobileNumber;
                     } else if (value.length < 10 || value.length > 10) {
                       return StringUtils.phoneDigits;
-                    }
+                    }*/
                     return null;
                   }),
                   _buildTextField(
                     emailController,
                     StringUtils.email,
                     keyboardType: TextInputType.emailAddress,
-                    validator: (value) =>
-                        value!.isEmpty ? StringUtils.enterEmail : null,
+                    /*validator: (value) =>
+                        value!.isEmpty ? StringUtils.enterEmail : null,*/
                   ),
                   SizedBox(height: 10),
                   Row(
