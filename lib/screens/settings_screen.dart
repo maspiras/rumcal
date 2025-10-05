@@ -17,7 +17,7 @@ import 'package:get/get.dart';
 import '../database/db_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'download_db.dart';
+//import 'download_db.dart';
 import 'login_screen.dart';
 
 class SettingsScreen extends StatefulWidget {

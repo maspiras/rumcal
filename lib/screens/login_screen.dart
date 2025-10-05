@@ -168,7 +168,7 @@ class LoginScreen extends StatelessWidget {
                     key: _formKey,
                     child: Column(
                       children: [
-                        Image.asset('assets/logo.jpg', height: 200),
+                        Image.asset('assets/logo-company-name.png', height: 200),
                         SizedBox(height: 50),
                         TextFormField(
                           controller: usernameController,

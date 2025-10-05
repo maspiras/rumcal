@@ -1,8 +1,8 @@
 // ignore_for_file: library_private_types_in_public_api
 
-import '/screens/account_screen.dart';
+/*import '/screens/account_screen.dart';
 import '/screens/app_settings_screen.dart';
-import '/screens/rate_app_screen.dart';
+import '/screens/rate_app_screen.dart';*/
 import '/screens/reservation_screen.dart';
 import '/screens/search_reservation.dart';
 import '/screens/settings_screen.dart';
@@ -92,6 +92,9 @@ class _MainScreenState extends State<MainScreen> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
+            SizedBox(
+          height: 120.0, // Set your desired height here
+          child:
             DrawerHeader(
               decoration: BoxDecoration(color: ColorUtils.blue),
               child: Text(
@@ -103,6 +106,7 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
             ),
+          ),
             /*ListTile(
               leading: Icon(Icons.person, color: ColorUtils.green),
               title: Text('My Account'),
