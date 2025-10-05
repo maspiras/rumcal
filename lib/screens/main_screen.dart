@@ -98,12 +98,12 @@ class _MainScreenState extends State<MainScreen> {
                 StringUtils.appTitle,
                 style: TextStyle(
                   color: ColorUtils.white,
-                  fontSize: 24,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            ListTile(
+            /*ListTile(
               leading: Icon(Icons.person, color: ColorUtils.green),
               title: Text('My Account'),
               onTap: () {
@@ -132,7 +132,7 @@ class _MainScreenState extends State<MainScreen> {
                     MaterialPageRoute(builder: (context) => RateAppScreen()));
               },
             ),
-            Divider(),
+            Divider(),*/
             ListTile(
               leading: Icon(Icons.logout, color: ColorUtils.red),
               title: Text('Logout'),
