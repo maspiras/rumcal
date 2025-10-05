@@ -13,7 +13,7 @@ void chooseAddCalendarBottomSheet(BuildContext context) {
     builder: (context) {
       return Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
+        child: SafeArea( child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
@@ -38,6 +38,7 @@ void chooseAddCalendarBottomSheet(BuildContext context) {
               leading: const Icon(Icons.bedroom_parent_outlined),
             ),
           ],
+        ),
         ),
       );
     },
