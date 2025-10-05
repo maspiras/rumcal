@@ -1,8 +1,8 @@
 // user_bloc.dart
-import 'package:cal_room/blocs/user/user_event.dart';
-import 'package:cal_room/blocs/user/user_state.dart';
-import 'package:cal_room/database/db_helper.dart';
-import 'package:cal_room/model/user_model.dart';
+import '/blocs/user/user_event.dart';
+import '/blocs/user/user_state.dart';
+import '/database/db_helper.dart';
+import '/model/user_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {

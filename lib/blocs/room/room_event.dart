@@ -1,4 +1,4 @@
-import 'package:cal_room/model/room_model.dart';
+import '/model/room_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class RoomEvent extends Equatable {

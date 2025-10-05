@@ -1,6 +1,6 @@
-import 'package:cal_room/utils/string_utils.dart' show StringUtils;
-import 'package:cal_room/widgets/add_edit_reservation_bottom_sheet.dart';
-import 'package:cal_room/widgets/add_edit_room_bottom_sheet.dart';
+import '/utils/string_utils.dart' show StringUtils;
+import '/widgets/add_edit_reservation_bottom_sheet.dart';
+import '/widgets/add_edit_room_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
 void chooseAddCalendarBottomSheet(BuildContext context) {

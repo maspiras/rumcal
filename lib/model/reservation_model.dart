@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:cal_room/model/room_model.dart';
+import '/model/room_model.dart';
 
 class ReservationModel {
   int? id;

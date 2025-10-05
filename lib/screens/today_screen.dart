@@ -1,7 +1,7 @@
-// import 'package:cal_room/controller/room_controller.dart';
-// import 'package:cal_room/screens/reservation_detail_screen.dart';
-// import 'package:cal_room/utils/color_utils.dart';
-// import 'package:cal_room/utils/string_utils.dart';
+// import '/controller/room_controller.dart';
+// import '/screens/reservation_detail_screen.dart';
+// import '/utils/color_utils.dart';
+// import '/utils/string_utils.dart';
 // import 'package:flutter/material.dart';
 // import '../controller/reservation_controller.dart';
 // import 'package:intl/intl.dart';
@@ -144,9 +144,9 @@
 //     );
 //   }
 // }
-import 'package:cal_room/blocs/reservation/reservation__bloc.dart';
-import 'package:cal_room/blocs/reservation/reservation__event.dart';
-import 'package:cal_room/blocs/reservation/reservation__state.dart';
+import '/blocs/reservation/reservation__bloc.dart';
+import '/blocs/reservation/reservation__event.dart';
+import '/blocs/reservation/reservation__state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';

@@ -1,5 +1,5 @@
-import 'package:cal_room/database/db_helper.dart';
-import 'package:cal_room/model/room_model.dart';
+import '/database/db_helper.dart';
+import '/model/room_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'room_event.dart';
 import 'room_state.dart';

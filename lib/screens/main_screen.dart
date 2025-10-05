@@ -1,14 +1,14 @@
 // ignore_for_file: library_private_types_in_public_api
 
-import 'package:cal_room/screens/account_screen.dart';
-import 'package:cal_room/screens/app_settings_screen.dart';
-import 'package:cal_room/screens/rate_app_screen.dart';
-import 'package:cal_room/screens/reservation_screen.dart';
-import 'package:cal_room/screens/search_reservation.dart';
-import 'package:cal_room/screens/settings_screen.dart';
-import 'package:cal_room/screens/today_screen.dart';
-import 'package:cal_room/utils/color_utils.dart';
-import 'package:cal_room/utils/string_utils.dart';
+import '/screens/account_screen.dart';
+import '/screens/app_settings_screen.dart';
+import '/screens/rate_app_screen.dart';
+import '/screens/reservation_screen.dart';
+import '/screens/search_reservation.dart';
+import '/screens/settings_screen.dart';
+import '/screens/today_screen.dart';
+import '/utils/color_utils.dart';
+import '/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 
 import 'calendar_screen.dart';

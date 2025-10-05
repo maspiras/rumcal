@@ -1,5 +1,5 @@
-import 'package:cal_room/database/db_helper.dart';
-import 'package:cal_room/model/login_user_model.dart';
+import '/database/db_helper.dart';
+import '/model/login_user_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'signup_event.dart';

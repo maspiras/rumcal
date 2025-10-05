@@ -1,6 +1,6 @@
-// import 'package:cal_room/utils/color_utils.dart';
-// import 'package:cal_room/utils/string_utils.dart';
-// import 'package:cal_room/widgets/add_edit_room_bottom_sheet.dart';
+// import '/utils/color_utils.dart';
+// import '/utils/string_utils.dart';
+// import '/widgets/add_edit_room_bottom_sheet.dart';
 // import 'package:flutter/material.dart';
 // import '../controller/room_controller.dart';
 // import 'export_pdf.dart';
@@ -98,14 +98,14 @@
 //     );
 //   }
 // }
-import 'package:cal_room/blocs/room/room_bloc.dart';
-import 'package:cal_room/blocs/room/room_event.dart';
-import 'package:cal_room/blocs/room/room_state.dart';
+import '/blocs/room/room_bloc.dart';
+import '/blocs/room/room_event.dart';
+import '/blocs/room/room_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cal_room/utils/color_utils.dart';
-import 'package:cal_room/utils/string_utils.dart';
-import 'package:cal_room/widgets/add_edit_room_bottom_sheet.dart';
+import '/utils/color_utils.dart';
+import '/utils/string_utils.dart';
+import '/widgets/add_edit_room_bottom_sheet.dart';
 import 'export_pdf.dart';
 
 class RoomScreen extends StatefulWidget {

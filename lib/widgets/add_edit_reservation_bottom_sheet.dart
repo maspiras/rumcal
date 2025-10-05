@@ -1,11 +1,11 @@
 // // ignore_for_file: invalid_use_of_protected_member
 //
-// // import 'package:cal_room/controller/reservation_controller.dart';
-// import 'package:cal_room/controller/room_controller.dart';
-// import 'package:cal_room/model/reservation_model.dart';
-// import 'package:cal_room/model/room_model.dart';
-// import 'package:cal_room/utils/color_utils.dart';
-// import 'package:cal_room/utils/string_utils.dart';
+// // import '/controller/reservation_controller.dart';
+// import '/controller/room_controller.dart';
+// import '/model/reservation_model.dart';
+// import '/model/room_model.dart';
+// import '/utils/color_utils.dart';
+// import '/utils/string_utils.dart';
 // import 'package:flutter/material.dart';
 
 // import 'package:intl/intl.dart';
@@ -683,15 +683,15 @@
 // }
 // ignore_for_file: invalid_use_of_protected_member
 
-// import 'package:cal_room/controller/reservation_controller.dart';
-import 'package:cal_room/blocs/reservation/reservation__bloc.dart';
-import 'package:cal_room/blocs/reservation/reservation__event.dart';
-import 'package:cal_room/blocs/room/room_bloc.dart';
-import 'package:cal_room/blocs/room/room_state.dart';
-import 'package:cal_room/model/reservation_model.dart';
-import 'package:cal_room/model/room_model.dart';
-import 'package:cal_room/utils/color_utils.dart';
-import 'package:cal_room/utils/string_utils.dart';
+// import '/controller/reservation_controller.dart';
+import '/blocs/reservation/reservation__bloc.dart';
+import '/blocs/reservation/reservation__event.dart';
+import '/blocs/room/room_bloc.dart';
+import '/blocs/room/room_state.dart';
+import '/model/reservation_model.dart';
+import '/model/room_model.dart';
+import '/utils/color_utils.dart';
+import '/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';

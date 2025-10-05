@@ -1,10 +1,10 @@
 // ignore_for_file: must_be_immutable, invalid_use_of_protected_member
 
-import 'package:cal_room/blocs/reservation/reservation__bloc.dart';
-import 'package:cal_room/blocs/reservation/reservation__state.dart';
-import 'package:cal_room/utils/color_utils.dart';
-import 'package:cal_room/utils/string_utils.dart';
-import 'package:cal_room/widgets/reservation_card_view.dart';
+import '/blocs/reservation/reservation__bloc.dart';
+import '/blocs/reservation/reservation__state.dart';
+import '/utils/color_utils.dart';
+import '/utils/string_utils.dart';
+import '/widgets/reservation_card_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

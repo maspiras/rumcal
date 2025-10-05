@@ -1,11 +1,11 @@
 // import 'package:cal_room/screens/login_screen.dart';
-import 'package:cal_room/blocs/reservation/reservation__bloc.dart';
-import 'package:cal_room/blocs/room/room_bloc.dart';
-import 'package:cal_room/blocs/user/user_bloc.dart';
-import 'package:cal_room/blocs/user/user_event.dart';
-import 'package:cal_room/screens/splash_screen.dart';
-import 'package:cal_room/utils/color_utils.dart';
-import 'package:cal_room/utils/string_utils.dart';
+import '/blocs/reservation/reservation__bloc.dart';
+import '/blocs/room/room_bloc.dart';
+import '/blocs/user/user_bloc.dart';
+import '/blocs/user/user_event.dart';
+import '/screens/splash_screen.dart';
+import '/utils/color_utils.dart';
+import '/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';

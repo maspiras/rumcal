@@ -1,7 +1,7 @@
 // import 'dart:developer';
-// import 'package:cal_room/model/room_model.dart';
-// import 'package:cal_room/utils/color_utils.dart';
-// import 'package:cal_room/utils/string_utils.dart';
+// import '/model/room_model.dart';
+// import '/utils/color_utils.dart';
+// import '/utils/string_utils.dart';
 // import 'package:flutter/material.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 //
@@ -121,11 +121,11 @@
 
 import 'dart:developer';
 
-import 'package:cal_room/blocs/room/room_bloc.dart';
-import 'package:cal_room/blocs/room/room_event.dart';
-import 'package:cal_room/model/room_model.dart';
-import 'package:cal_room/utils/color_utils.dart';
-import 'package:cal_room/utils/string_utils.dart';
+import '/blocs/room/room_bloc.dart';
+import '/blocs/room/room_event.dart';
+import '/model/room_model.dart';
+import '/utils/color_utils.dart';
+import '/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';

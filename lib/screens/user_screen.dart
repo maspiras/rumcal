@@ -2,8 +2,8 @@
 //
 // import 'dart:developer';
 //
-// import 'package:cal_room/utils/color_utils.dart';
-// import 'package:cal_room/utils/string_utils.dart';
+// import '/utils/color_utils.dart';
+// import '/utils/string_utils.dart';
 // import 'package:flutter/material.dart';
 
 // ignore_for_file: use_build_context_synchronously
@@ -296,9 +296,9 @@
 //   }
 // }
 // user_screen.dart
-import 'package:cal_room/blocs/user/user_bloc.dart';
-import 'package:cal_room/blocs/user/user_event.dart';
-import 'package:cal_room/blocs/user/user_state.dart';
+import '/blocs/user/user_bloc.dart';
+import '/blocs/user/user_event.dart';
+import '/blocs/user/user_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';

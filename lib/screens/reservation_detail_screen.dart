@@ -1,7 +1,7 @@
 // ignore_for_file: must_be_immutable
-import 'package:cal_room/utils/color_utils.dart';
-import 'package:cal_room/utils/string_utils.dart';
-import 'package:cal_room/widgets/add_edit_reservation_bottom_sheet.dart';
+import '/utils/color_utils.dart';
+import '/utils/string_utils.dart';
+import '/widgets/add_edit_reservation_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import '../model/reservation_model.dart';
 

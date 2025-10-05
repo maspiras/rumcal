@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cal_room/utils/color_utils.dart';
+import '/utils/color_utils.dart';
 
 class RateAppScreen extends StatelessWidget {
   const RateAppScreen({super.key});

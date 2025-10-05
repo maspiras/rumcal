@@ -1,5 +1,5 @@
 // Updated ReservationState with a getter to access reservations safely
-import 'package:cal_room/model/reservation_model.dart';
+import '/model/reservation_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class ReservationState extends Equatable {

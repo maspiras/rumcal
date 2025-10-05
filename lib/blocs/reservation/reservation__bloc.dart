@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
-import 'package:cal_room/blocs/reservation/reservation__event.dart';
-import 'package:cal_room/blocs/reservation/reservation__state.dart';
-import 'package:cal_room/model/reservation_model.dart';
+import '/blocs/reservation/reservation__event.dart';
+import '/blocs/reservation/reservation__state.dart';
+import '/model/reservation_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../database/db_helper.dart';
 

@@ -2,10 +2,10 @@
 //
 // ignore_for_file: library_private_types_in_public_api
 
-import 'package:cal_room/blocs/signup/signup_bloc.dart';
-import 'package:cal_room/blocs/signup/signup_event.dart';
-import 'package:cal_room/blocs/signup/signup_state.dart';
-import 'package:cal_room/utils/string_utils.dart';
+import '/blocs/signup/signup_bloc.dart';
+import '/blocs/signup/signup_event.dart';
+import '/blocs/signup/signup_state.dart';
+import '/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import '../database/db_helper.dart';

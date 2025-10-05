@@ -1,11 +1,11 @@
 // ignore_for_file: invalid_use_of_protected_member, unnecessary_to_list_in_spreads
 
-import 'package:cal_room/blocs/reservation/reservation__bloc.dart';
-import 'package:cal_room/blocs/reservation/reservation__state.dart';
+import '/blocs/reservation/reservation__bloc.dart';
+import '/blocs/reservation/reservation__state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:cal_room/utils/color_utils.dart';
+import '/utils/color_utils.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});

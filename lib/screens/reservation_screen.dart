@@ -1,8 +1,8 @@
-// import 'package:cal_room/controller/room_controller.dart';
-// import 'package:cal_room/utils/color_utils.dart';
-// import 'package:cal_room/utils/string_utils.dart';
-// import 'package:cal_room/widgets/add_edit_reservation_bottom_sheet.dart';
-// import 'package:cal_room/widgets/reservation_card_view.dart';
+// import '/controller/room_controller.dart';
+// import '/utils/color_utils.dart';
+// import '/utils/string_utils.dart';
+// import '/widgets/add_edit_reservation_bottom_sheet.dart';
+// import '/widgets/reservation_card_view.dart';
 // import 'package:flutter/material.dart';
 // import 'package:intl/intl.dart';
 // import '../controller/reservation_controller.dart';
@@ -181,16 +181,16 @@
 // }
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:cal_room/blocs/reservation/reservation__bloc.dart';
-import 'package:cal_room/blocs/reservation/reservation__event.dart';
-import 'package:cal_room/blocs/reservation/reservation__state.dart';
-import 'package:cal_room/blocs/room/room_bloc.dart';
-import 'package:cal_room/blocs/room/room_event.dart';
-// import 'package:cal_room/controller/room_controller.dart';
-import 'package:cal_room/utils/color_utils.dart';
-import 'package:cal_room/utils/string_utils.dart';
-import 'package:cal_room/widgets/add_edit_reservation_bottom_sheet.dart';
-import 'package:cal_room/widgets/reservation_card_view.dart';
+import '/blocs/reservation/reservation__bloc.dart';
+import '/blocs/reservation/reservation__event.dart';
+import '/blocs/reservation/reservation__state.dart';
+import '/blocs/room/room_bloc.dart';
+import '/blocs/room/room_event.dart';
+// import '/controller/room_controller.dart';
+import '/utils/color_utils.dart';
+import '/utils/string_utils.dart';
+import '/widgets/add_edit_reservation_bottom_sheet.dart';
+import '/widgets/reservation_card_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';

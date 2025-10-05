@@ -1,16 +1,16 @@
 // ignore_for_file: use_key_in_widget_constructors, use_build_context_synchronously
 
-import 'package:cal_room/blocs/reservation/reservation__bloc.dart';
-import 'package:cal_room/blocs/reservation/reservation__event.dart';
-import 'package:cal_room/blocs/room/room_bloc.dart';
-import 'package:cal_room/blocs/room/room_event.dart';
-import 'package:cal_room/blocs/user/user_bloc.dart';
-import 'package:cal_room/blocs/user/user_event.dart';
-import 'package:cal_room/screens/sales_report_screen.dart';
-import 'package:cal_room/screens/transaction_report.dart';
-import 'package:cal_room/screens/user_screen.dart';
-import 'package:cal_room/utils/color_utils.dart';
-import 'package:cal_room/utils/string_utils.dart';
+import '/blocs/reservation/reservation__bloc.dart';
+import '/blocs/reservation/reservation__event.dart';
+import '/blocs/room/room_bloc.dart';
+import '/blocs/room/room_event.dart';
+import '/blocs/user/user_bloc.dart';
+import '/blocs/user/user_event.dart';
+import '/screens/sales_report_screen.dart';
+import '/screens/transaction_report.dart';
+import '/screens/user_screen.dart';
+import '/utils/color_utils.dart';
+import '/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';

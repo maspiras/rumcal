@@ -1,5 +1,5 @@
 // user_event.dart
-import 'package:cal_room/model/user_model.dart';
+import '/model/user_model.dart';
 
 abstract class UserEvent {}
 

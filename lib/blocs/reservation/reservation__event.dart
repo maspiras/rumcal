@@ -1,4 +1,4 @@
-import 'package:cal_room/model/reservation_model.dart';
+import '/model/reservation_model.dart';
 
 abstract class ReservationEvent {}
 

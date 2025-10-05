@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cal_room/utils/color_utils.dart';
+import '/utils/color_utils.dart';
 
 class AppSettingsScreen extends StatelessWidget {
   const AppSettingsScreen({super.key});
