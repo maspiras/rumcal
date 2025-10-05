@@ -48,12 +48,20 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             useMaterial3: true,
-            colorSchemeSeed: ColorUtils.blue,
+            //colorSchemeSeed: ColorUtils.blue,
+            //ColorScheme myColorScheme = ColorScheme.fromSeed(seedColor: Colors.blue),
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+
             scaffoldBackgroundColor: ColorUtils.grey[100],
             appBarTheme: AppBarTheme(
-              backgroundColor: ColorUtils.blue,
+              /*backgroundColor: ColorUtils.blue,
+              foregroundColor: ColorUtils.white,
+              elevation: 4,*/
+              // backgroundColor: Colors.brown,
+              backgroundColor: Color(0xFF967969),
               foregroundColor: ColorUtils.white,
               elevation: 4,
+
             ),
             iconTheme: IconThemeData(color: ColorUtils.white),
           ),
