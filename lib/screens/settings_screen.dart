@@ -142,12 +142,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () =>
                 resetDatabase(context, table: StringUtils.reservations),
           ),
-          ListTile(
+          /*ListTile(
             leading:
                 Icon(Icons.insert_drive_file_outlined, color: ColorUtils.blue),
             title: Text(StringUtils.downloadDB),
             onTap: () async => await DownloadDBFile.downloadDBFile(),
-          ),
+          ),*/
 
           Divider(),
 
