@@ -1,15 +1,20 @@
-// ignore_for_file: must_be_immutable, invalid_use_of_protected_member
-
-import '/blocs/reservation/reservation__bloc.dart';
-import '/blocs/reservation/reservation__state.dart';
-import '/utils/color_utils.dart';
-import '/utils/string_utils.dart';
-import '/widgets/reservation_card_view.dart';
+import 'package:bookcomfy/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SearchReservation extends StatelessWidget {
-  SearchReservation({super.key});
+import '../blocs/reservation/reservation__bloc.dart' show ReservationBloc;
+import '../blocs/reservation/reservation__state.dart';
+import '../utils/color_utils.dart';
+import '../widgets/reservation_card_view.dart';
+
+class SearchReservation extends StatefulWidget {
+  const SearchReservation({Key? key}) : super(key: key);
+
+  @override
+  State<SearchReservation> createState() => _SearchReservationState();
+}
+
+class _SearchReservationState extends State<SearchReservation> {
   String searchStr = "";
 
   @override
@@ -17,7 +22,7 @@ class SearchReservation extends StatelessWidget {
     return Scaffold(
       extendBody: false,
       appBar: AppBar(
-       //backgroundColor: ColorUtils.blue,
+        backgroundColor: ColorUtils.blue,
         leadingWidth: 0,
         leading: SizedBox(),
         title: Container(
@@ -37,11 +42,17 @@ class SearchReservation extends StatelessWidget {
               Expanded(
                 child: TextField(
                   onChanged: (value) {
-                    searchStr = value;
+                    setState(() {
+                      searchStr = value;
+                    });
                   },
                   style: TextStyle(color: ColorUtils.white),
                   cursorColor: ColorUtils.white,
-                  decoration: InputDecoration(border: InputBorder.none),
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "Search by name or phone",
+                    hintStyle: TextStyle(color: ColorUtils.white70),
+                  ),
                 ),
               ),
             ],
@@ -58,9 +69,24 @@ class SearchReservation extends StatelessWidget {
             final reservationList = state.reservations;
 
             if (searchStr.isEmpty) {
-              return const Center(child: Text('No Data available'));
+              // Show full list when search is empty
+              if (reservationList.isEmpty) {
+                return const Center(child: Text('No Data available'));
+              }
+
+              return ListView.builder(
+                itemCount: reservationList.length,
+                itemBuilder: (context, index) {
+                  final reservation = reservationList[index];
+                  return ReservationCardView(
+                    reservation: reservation,
+                    isFromToday: false,
+                  );
+                },
+              );
             }
 
+            // Filtered list as per search string
             final filteredList = reservationList
                 .where(
                   (element) =>

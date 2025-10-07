@@ -18,7 +18,7 @@ class DBHelper {
     final path = join(await getDatabasesPath(), dbName);
     return await openDatabase(
       path,
-      version: 7,
+      version: 8,
       onCreate: _createDB,
       onUpgrade: _upGradeDB,
       singleInstance: true, // ✅ Ensure only one instance of the DB is used
@@ -75,6 +75,7 @@ class DBHelper {
   subtotal REAL NOT NULL,
   discount REAL NOT NULL,
   tax REAL NOT NULL,
+    taxPercent REAL NOT NULL,   
   grandtotal REAL NOT NULL,
   prepayment REAL NOT NULL,
   balance REAL NOT NULL,
@@ -86,9 +87,13 @@ class DBHelper {
 
   static Future<void> _upGradeDB(
       Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < newVersion) {
-      db.execute("ALTER TABLE Reservations ADD COLUMN roomId INTEGER;");
-      db.execute("ALTER TABLE Reservations ADD COLUMN roomName TEXT;");
+    if (oldVersion < 7) {
+      await db.execute("ALTER TABLE Reservations ADD COLUMN roomId INTEGER;");
+      await db.execute("ALTER TABLE Reservations ADD COLUMN roomName TEXT;");
+    }
+    if (oldVersion < 8) {
+      await db.execute(
+          "ALTER TABLE Reservations ADD COLUMN taxPercent REAL DEFAULT 5.0;");
     }
   }
 

@@ -17,6 +17,7 @@ class ReservationModel {
   double subtotal;
   double discount;
   double tax;
+  double taxPercent;
   double grandTotal;
   double prepayment;
   double balance;
@@ -44,6 +45,7 @@ class ReservationModel {
     required this.balance,
     required this.roomId,
     required this.roomName,
+    required this.taxPercent,
     required this.rooms,
   });
 
@@ -61,6 +63,7 @@ class ReservationModel {
       'child': child,
       'pet': pet,
       'ratepernight': ratePerNight,
+      'taxPercent': taxPercent,
       'subtotal': subtotal,
       'discount': discount,
       'tax': tax,
@@ -72,7 +75,7 @@ class ReservationModel {
       'rooms': jsonEncode(rooms
           .map(
             (e) => e.toMap(),
-          )
+      )
           .toList()),
     };
   }
@@ -94,17 +97,20 @@ class ReservationModel {
       subtotal: map['subtotal'],
       discount: map['discount'],
       tax: map['tax'],
+      taxPercent: map['taxPercent'] ?? 5.0,
       grandTotal: map['grandtotal'],
       prepayment: map['prepayment'],
       balance: map['balance'],
       roomId: map['roomId'] ?? 0,
       roomName: map['roomName'] ?? "",
-      rooms: map['rooms'] != null && map['rooms'] != "" && map['rooms'] != "null"
-          ? (jsonDecode(map['rooms']) as List).cast<Map<String,dynamic>>()
-              .map(
-                (e) => RoomModel.fromMap(e),
-              )
-              .toList()
+      rooms:
+      map['rooms'] != null && map['rooms'] != "" && map['rooms'] != "null"
+          ? (jsonDecode(map['rooms']) as List)
+          .cast<Map<String, dynamic>>()
+          .map(
+            (e) => RoomModel.fromMap(e),
+      )
+          .toList()
           : [],
     );
   }
