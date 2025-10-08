@@ -86,19 +86,28 @@ class CalendarScreenState extends State<CalendarScreen> {
   bool isDataLoad = false;
 
   void listenScrollController() {
-    scrollController.addListener(
-      () {
-        if (scrollController.offset <= 0 && isDataLoad == false) {
-          isDataLoad = true;
-          setBeforeDates(isFromListen: true);
-        } else if (scrollController.offset >=
-                scrollController.position.maxScrollExtent &&
-            isDataLoad == false) {
-          isDataLoad = true;
-          setAfterDates(isFromListen: true);
-        }
-      },
-    );
+    scrollController.addListener(() {
+      if (scrollController.offset <= 0 && !isDataLoad) {
+        isDataLoad = true;
+        setBeforeDates(isFromListen: true);
+      } else if (scrollController.offset >=
+              scrollController.position.maxScrollExtent &&
+          !isDataLoad) {
+        isDataLoad = true;
+        setAfterDates(isFromListen: true);
+      }
+
+      // 🔹 Update month dynamically while scrolling
+      double offset = scrollController.offset;
+      int currentIndex =
+          (offset / 50).round().clamp(0, calenderDates.length - 1);
+      final currentDate = calenderDates[currentIndex];
+
+      if (DateFormat("MM-yyyy").format(selectedMonth) !=
+          DateFormat("MM-yyyy").format(currentDate)) {
+        setState(() => selectedMonth = currentDate);
+      }
+    });
   }
 
   void setBeforeDates({bool isFromListen = false}) {
@@ -208,13 +217,14 @@ class CalendarScreenState extends State<CalendarScreen> {
                             GestureDetector(
                               onTap: onDateTap,
                               child: SizedBox(
-                                height: 53,
+                                height: 62,
                                 child: Column(
                                   children: [
                                     Text("${selectedMonth.year}",
                                         style: TextStyle(fontSize: 18)),
-                                    Text(DateFormat('MMM')
-                                        .format(selectedMonth)),
+                                    Text(
+                                        DateFormat('MMM').format(selectedMonth),
+                                        style: TextStyle(fontSize: 18)),
                                   ],
                                 ),
                               ),
@@ -344,128 +354,110 @@ class CalendarScreenState extends State<CalendarScreen> {
 
                             return Expanded(
                               child: SizedBox(
-                                height: (roomList.length + 1) * 51.5,
+                                height: (roomList.length + 1) * 52,
                                 width: MediaQuery.of(context).size.width,
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   controller: scrollController,
                                   child: Stack(
+                                    clipBehavior: Clip.none,
                                     children: [
+                                      // ───────── GRID ─────────
                                       Row(
                                         children: List.generate(
                                             calenderDates.length, (index) {
-                                          bool isCurrentDate =
-                                              DateFormat("dd-MM-yyyy").format(
-                                                      calenderDates[index]) ==
+                                          final date = calenderDates[index];
+                                          final isCurrentDate =
+                                              DateFormat("dd-MM-yyyy")
+                                                      .format(date) ==
                                                   DateFormat("dd-MM-yyyy")
                                                       .format(DateTime.now());
 
-                                          return VisibilityDetector(
-                                            key: ValueKey(calenderDates[index]
-                                                .millisecondsSinceEpoch),
-                                            onVisibilityChanged: (info) {
-                                              if (info.visibleFraction == 1.0 &&
-                                                  DateFormat("MM-yyyy").format(
-                                                          selectedMonth) !=
-                                                      DateFormat("MM-yyyy")
-                                                          .format(calenderDates[
-                                                              index])) {
-                                                setState(() => selectedMonth =
-                                                    calenderDates[index]);
-                                                if (calenderDates[index]
-                                                    .isAfter(
-                                                        calenderCenterDate)) {
-                                                  setAfterDates();
-                                                } else {
-                                                  setBeforeDates();
-                                                }
-                                              }
-                                            },
+                                          return SizedBox(
+                                            width: 50,
                                             child: Column(
                                               children: [
+                                                // Date Header
                                                 SizedBox(
                                                   height: 48.5,
-                                                  width: 50,
                                                   child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: [
-                                                      Text(
-                                                          "${calenderDates[index].day}"),
+                                                      Text("${date.day}",
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize:
+                                                                      13)),
                                                       Text(
                                                         DateFormat("EEE")
-                                                            .format(
-                                                                calenderDates[
-                                                                    index])
+                                                            .format(date)
                                                             .substring(0, 2),
+                                                        style: const TextStyle(
+                                                            fontSize: 11),
                                                       ),
                                                     ],
                                                   ),
                                                 ),
-                                                SizedBox(
-                                                  width: 50,
+
+                                                // Room grid cells
+                                                Expanded(
                                                   child: Stack(
-                                                    clipBehavior: Clip.none,
                                                     children: [
                                                       Column(
-                                                        children:
-                                                            roomList.map((e) {
-                                                          return InkWell(
-                                                            onTap: () async {
-                                                              await addEditReservationBottomSheet(
-                                                                  context);
-                                                            },
-                                                            child: Container(
-                                                              height: 51.5,
-                                                              width: 50,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                border:
-                                                                    Border.all(
-                                                                  color: ColorUtils
-                                                                      .grey
-                                                                      .withAlpha(
-                                                                          80),
-                                                                  width: 0.4,
-                                                                ),
+                                                        children: roomList
+                                                            .map((room) {
+                                                          return Container(
+                                                            height: 51.5,
+                                                            width: 50,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              border:
+                                                                  Border.all(
+                                                                color: ColorUtils
+                                                                    .grey
+                                                                    .withOpacity(
+                                                                        0.3),
+                                                                width: 0.4,
                                                               ),
                                                             ),
                                                           );
                                                         }).toList(),
                                                       ),
                                                       if (isCurrentDate)
-                                                        Center(
-                                                          child: SizedBox(
-                                                            height: roomList
-                                                                    .length *
-                                                                51.5,
-                                                            width: 50,
-                                                            child: Stack(
-                                                              children: [
-                                                                Center(
-                                                                    child: VerticalDivider(
-                                                                        color: ColorUtils
-                                                                            .blue)),
-                                                                Align(
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .topCenter,
+                                                        Positioned.fill(
+                                                          child: Column(
+                                                            children: [
+                                                              Align(
+                                                                alignment:
+                                                                    Alignment
+                                                                        .topCenter,
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          top:
+                                                                              5),
                                                                   child:
-                                                                      Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .only(
-                                                                        top: 5,
-                                                                        left:
-                                                                            1),
-                                                                    child:
-                                                                        CircleAvatar(
-                                                                      radius: 6,
-                                                                      backgroundColor:
-                                                                          ColorUtils
-                                                                              .blue,
-                                                                    ),
+                                                                      CircleAvatar(
+                                                                    radius: 5,
+                                                                    backgroundColor:
+                                                                        ColorUtils
+                                                                            .blue,
                                                                   ),
                                                                 ),
-                                                              ],
-                                                            ),
+                                                              ),
+                                                              Expanded(
+                                                                child:
+                                                                    VerticalDivider(
+                                                                  color:
+                                                                      ColorUtils
+                                                                          .blue,
+                                                                  width: 2,
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
                                                         ),
                                                     ],
@@ -477,110 +469,101 @@ class CalendarScreenState extends State<CalendarScreen> {
                                         }),
                                       ),
 
-                                      // Reservation Bars
-                                      for (int i = 0;
-                                          i < reservationList.length;
-                                          i++)
-                                        Builder(builder: (context) {
-                                          final reservation =
-                                              reservationList[i];
-                                          if (reservation.roomId == 0) {
-                                            return SizedBox();
-                                          }
+                                      // ───────── RESERVATION BARS ─────────
+                                      ...reservationList
+                                          .where((r) => r.roomId != 0)
+                                          .map((reservation) {
+                                        final inDays =
+                                            DateTime.parse(reservation.checkout)
+                                                .difference(DateTime.parse(
+                                                    reservation.checkin))
+                                                .inDays;
 
-                                          final inDays = DateTime.parse(
-                                                  reservation.checkout)
-                                              .difference(DateTime.parse(
-                                                  reservation.checkin))
-                                              .inDays;
+                                        final containIndex =
+                                            calenderDates.indexWhere((date) =>
+                                                DateFormat("yyyy-MM-dd")
+                                                    .format(date) ==
+                                                reservation.checkin);
 
-                                          final containIndex =
-                                              calenderDates.indexWhere((date) =>
-                                                  DateFormat("yyyy-MM-dd")
-                                                      .format(date) ==
-                                                  reservation.checkin);
+                                        if (containIndex == -1)
+                                          return const SizedBox();
 
-                                          if (containIndex == -1) {
-                                            return SizedBox();
-                                          }
+                                        final roomIdIndex = roomList.indexWhere(
+                                            (room) =>
+                                                room.id == reservation.roomId);
+                                        if (roomIdIndex == -1)
+                                          return const SizedBox();
 
-                                          final roomIdIndex =
-                                              roomList.indexWhere((room) =>
-                                                  room.id ==
-                                                  reservation.roomId);
-
-                                          return Positioned(
-                                            top: ((roomIdIndex + 1) * 51.5) +
-                                                2.5,
-                                            left: (containIndex * 50),
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ReservationDetailScreen(
-                                                            reservation:
-                                                                reservation),
+                                        return Positioned(
+                                          top: ((roomIdIndex + 1) * 51.5) + 3,
+                                          left: (containIndex * 50),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ReservationDetailScreen(
+                                                    reservation: reservation,
                                                   ),
-                                                );
-                                              },
-                                              child: Container(
-                                                height: 45,
-                                                width: ((inDays + 1) * 50),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.transparent,
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
                                                 ),
-                                                child: Center(
-                                                  child: Container(
-                                                    height: 45,
-                                                    width: (inDays * 50),
-                                                    decoration: BoxDecoration(
-                                                      color: CommonMethod()
-                                                          .reservationColor(
-                                                              reservation),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              50),
-                                                    ),
-                                                    child: Center(
-                                                      child: Text(
-                                                        reservation.fullname,
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                          color: reservation
-                                                                      .balance ==
-                                                                  0
-                                                              ? ColorUtils.black
-                                                              : ColorUtils
-                                                                  .white,
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ),
+                                              );
+                                            },
+                                            child: Container(
+                                              height: 45,
+                                              width: ((inDays + 1) * 50),
+                                              decoration: BoxDecoration(
+                                                color: CommonMethod()
+                                                    .reservationColor(
+                                                        reservation),
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.15),
+                                                    blurRadius: 2,
+                                                    offset: const Offset(1, 1),
+                                                  ),
+                                                ],
+                                              ),
+                                              alignment: Alignment.center,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 6),
+                                              child: FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: Text(
+                                                  reservation.fullname,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    color:
+                                                        reservation.balance == 0
+                                                            ? ColorUtils.black
+                                                            : ColorUtils.white,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          );
-                                        }),
+                                          ),
+                                        );
+                                      }).toList(),
                                     ],
                                   ),
                                 ),
                               ),
                             );
                           } else if (state is RoomLoading) {
-                            return Center(child: CircularProgressIndicator());
+                            return const Center(
+                                child: CircularProgressIndicator());
                           } else if (state is RoomError) {
                             return Center(child: Text(state.message));
                           } else {
-                            return SizedBox();
+                            return const SizedBox();
                           }
                         },
                       )
@@ -663,42 +646,13 @@ class CalendarScreenState extends State<CalendarScreen> {
                           child: Text("OK")),
                     ],
                   ),
+                ),
+                SizedBox(
+                  height: 30,
                 )
               ],
             ),
           );
         });
   }
-
-  // void confirmDelete(BuildContext context, int id) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: Text(StringUtils.deleteRoomTitle),
-  //       content: Text(StringUtils.deleteRoomMessage),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.of(context).pop(), // Cancel
-  //           child: Text(StringUtils.cancel),
-  //         ),
-  //         ElevatedButton(
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: Colors.red,
-  //           ),
-  //           onPressed: () async {
-  //             await Future.delayed(
-  //                 Duration(milliseconds: 300)); // Optional delay
-  //             context.read<RoomBloc>().add(DeleteRoom(id));
-  //             context.read<RoomBloc>().add(FetchRooms());
-  //             Navigator.of(context).pop(); // Close the dialog
-  //           },
-  //           child: Text(
-  //             StringUtils.delete,
-  //             style: TextStyle(color: Colors.white),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }
