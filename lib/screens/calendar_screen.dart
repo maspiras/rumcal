@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_function_literals_in_foreach_calls
+// ignore_for_file: library_private_types_in_public_api, avoid_function_literals_in_foreach_calls, curly_braces_in_flow_control_structures, deprecated_member_use, unnecessary_to_list_in_spreads
 import '/blocs/reservation/reservation__bloc.dart';
 import '/blocs/reservation/reservation__event.dart';
 import '/blocs/reservation/reservation__state.dart';
@@ -8,14 +8,12 @@ import '/blocs/room/room_state.dart';
 import '/model/reservation_model.dart';
 import '/utils/color_utils.dart';
 import '/utils/string_utils.dart';
-import '/widgets/add_edit_reservation_bottom_sheet.dart';
 import '/widgets/add_edit_room_bottom_sheet.dart';
 import '/widgets/choose_add_calendar_bottom_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 import '../widgets/common_method.dart';
 import 'reservation_detail_screen.dart';
 
