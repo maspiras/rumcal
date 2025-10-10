@@ -1,9 +1,8 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 /*import '/screens/account_screen.dart';
 import '/screens/app_settings_screen.dart';
 import '/screens/rate_app_screen.dart';*/
-import 'package:bookcomfy/database/db_helper.dart';
 import 'package:bookcomfy/screens/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
