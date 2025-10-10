@@ -45,7 +45,7 @@ class CalendarScreenState extends State<CalendarScreen> {
   Future<void> checkUserAndInitialize() async {
     final prefs = await SharedPreferences.getInstance();
     final currentUserId = prefs.getString('userId');
-    
+
     if (_currentUserId != currentUserId || !_dataFetched) {
       _currentUserId = currentUserId;
       _dataFetched = false;
@@ -62,11 +62,11 @@ class CalendarScreenState extends State<CalendarScreen> {
     if (_shouldShowLoader) {
       setState(() => isLoading = true);
     }
-    
+
     context.read<ReservationBloc>().add(FetchReservationsEvent());
     context.read<RoomBloc>().add(FetchRooms());
     _dataFetched = true;
-    
+
     await Future.delayed(Duration(milliseconds: 300), () {
       setCalenderDates(isFromInit: true);
     });
@@ -284,7 +284,8 @@ class CalendarScreenState extends State<CalendarScreen> {
                                 Expanded(
                                   child: BlocBuilder<RoomBloc, RoomState>(
                                     builder: (context, state) {
-                                      if (state is RoomLoading && _shouldShowLoader) {
+                                      if (state is RoomLoading &&
+                                          _shouldShowLoader) {
                                         return Center(
                                             child: CircularProgressIndicator());
                                       } else if (state is RoomLoaded) {
@@ -513,18 +514,36 @@ class CalendarScreenState extends State<CalendarScreen> {
                                                                     .min,
                                                             children: roomList
                                                                 .map((room) {
-                                                              return Container(
-                                                                height: 50,
-                                                                width: 50,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  border: Border
-                                                                      .all(
-                                                                    color: ColorUtils
-                                                                        .grey
-                                                                        .withOpacity(
-                                                                            0.3),
-                                                                    width: 0.4,
+                                                              print(
+                                                                  'Device Height: ${MediaQuery.of(context).size.height}');
+
+                                                              return Padding(
+                                                                padding: EdgeInsets.only(
+                                                                    top: MediaQuery.of(context).size.height > 900
+                                                                        ? 3.0
+                                                                        : MediaQuery.of(context).size.height > 800
+                                                                            ? 8.0
+                                                                            : MediaQuery.of(context).size.height < 700
+                                                                                ? 0.0
+                                                                                : MediaQuery.of(context).size.height < 600
+                                                                                    ? 0.0
+                                                                                    : 0),
+                                                                child:
+                                                                    Container(
+                                                                  height: 50,
+                                                                  width: 50,
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    border:
+                                                                        Border
+                                                                            .all(
+                                                                      color: ColorUtils
+                                                                          .grey
+                                                                          .withOpacity(
+                                                                              0.3),
+                                                                      width:
+                                                                          0.4,
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               );
@@ -590,11 +609,9 @@ class CalendarScreenState extends State<CalendarScreen> {
                                             bool isLargeFont = textScale >
                                                 1.1; // accessibility text scaling
 
-                                            // 🔹 Adaptive top logic
+                                            // 🔹 Adaptive top logic - match room height
                                             double baseTop =
-                                                isSmallDevice && isLargeFont
-                                                    ? 65.5
-                                                    : 48.5;
+                                                50.0; // Match room container height
                                             final inDays = DateTime.parse(
                                                     reservation.checkout)
                                                 .difference(DateTime.parse(
@@ -617,18 +634,32 @@ class CalendarScreenState extends State<CalendarScreen> {
                                             if (roomIdIndex == -1)
                                               return const SizedBox();
 
+                                            // Calculate dynamic heights to match room positioning
+                                            final isSmallOrLargeFont =
+                                                MediaQuery.of(context)
+                                                            .size
+                                                            .height <
+                                                        700 ||
+                                                    MediaQuery.of(context)
+                                                            .textScaleFactor >
+                                                        1.1;
+                                            final headerHeight =
+                                                isSmallOrLargeFont
+                                                    ? 60.0
+                                                    : 70.0;
+                                            final roomSpacing =
+                                                52.0; // Room height + margin
+
+                                            // Calculate positioning based on device conditions
+                                            final reservationHeaderHeight =
+                                                isSmallDevice || isLargeFont
+                                                    ? 60.0
+                                                    : 70.0;
+
                                             return Positioned(
-                                              top: ((roomIdIndex + 1) *
-                                                      baseTop) +
-                                                  (MediaQuery.of(context)
-                                                                  .size
-                                                                  .height <
-                                                              700 ||
-                                                          MediaQuery.of(context)
-                                                                  .textScaleFactor >
-                                                              1.1
-                                                      ? 12
-                                                      : 12),
+                                              top: reservationHeaderHeight +
+                                                  (roomIdIndex *
+                                                      50.0), // Dynamic positioning
                                               left: (containIndex * 50),
                                               child: GestureDetector(
                                                 onTap: () {
@@ -644,7 +675,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                                                   );
                                                 },
                                                 child: Container(
-                                                  height: 45,
+                                                  height: 48,
                                                   width: ((inDays + 1) * 50),
                                                   decoration: BoxDecoration(
                                                     color: CommonMethod()
@@ -694,7 +725,8 @@ class CalendarScreenState extends State<CalendarScreen> {
                                     ),
                                   ),
                                 );
-                              } else if (state is RoomLoading && _shouldShowLoader) {
+                              } else if (state is RoomLoading &&
+                                  _shouldShowLoader) {
                                 return const Center(
                                     child: CircularProgressIndicator());
                               } else if (state is RoomError) {
