@@ -163,6 +163,13 @@
             </list>
           </value>
         </entry>
+        <entry key="flutter_screenutil">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../../flutter_pub_cache/hosted/pub.dev/flutter_screenutil-5.9.3/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="flutter_test">
           <value>
             <list>
@@ -647,6 +654,7 @@
       <root url="file://$PROJECT_DIR$/../../../flutter_pub_cache/hosted/pub.dev/flutter_bloc-9.1.1/lib" />
       <root url="file://$PROJECT_DIR$/../../../flutter_pub_cache/hosted/pub.dev/flutter_launcher_icons-0.13.1/lib" />
       <root url="file://$PROJECT_DIR$/../../../flutter_pub_cache/hosted/pub.dev/flutter_lints-5.0.0/lib" />
+      <root url="file://$PROJECT_DIR$/../../../flutter_pub_cache/hosted/pub.dev/flutter_screenutil-5.9.3/lib" />
       <root url="file://$PROJECT_DIR$/../../../flutter_pub_cache/hosted/pub.dev/get-4.7.2/lib" />
       <root url="file://$PROJECT_DIR$/../../../flutter_pub_cache/hosted/pub.dev/image-4.5.3/lib" />
       <root url="file://$PROJECT_DIR$/../../../flutter_pub_cache/hosted/pub.dev/intl-0.20.2/lib" />

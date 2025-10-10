@@ -14,43 +14,60 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/common_method.dart';
 import 'reservation_detail_screen.dart';
 
 class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({super.key});
+  final bool fromLogin;
+  const CalendarScreen({super.key, this.fromLogin = false});
 
   @override
   CalendarScreenState createState() => CalendarScreenState();
 }
 
 class CalendarScreenState extends State<CalendarScreen> {
-  // final ReservationController reservationController = Get.find();
-  // late Worker _reservationListener;
   bool isLoading = true;
   DateTime selectedMonth = DateTime.now();
   DateTime calenderCenterDate = DateTime.now();
   late ScrollController scrollController;
   List<DateTime> calenderDates = [];
+  static bool _dataFetched = false;
+  static String? _currentUserId;
+  bool _shouldShowLoader = false;
 
   @override
   void initState() {
     super.initState();
-    initializeScreen();
+    checkUserAndInitialize();
+  }
+
+  Future<void> checkUserAndInitialize() async {
+    final prefs = await SharedPreferences.getInstance();
+    final currentUserId = prefs.getString('userId');
+    
+    if (_currentUserId != currentUserId || !_dataFetched) {
+      _currentUserId = currentUserId;
+      _dataFetched = false;
+      _shouldShowLoader = widget.fromLogin;
+      initializeScreen();
+    } else {
+      _shouldShowLoader = false;
+      setState(() => isLoading = false);
+      setCalenderDates(isFromInit: true);
+    }
   }
 
   Future<void> initializeScreen() async {
-    setState(() => isLoading = true);
-
-    // Await room and reservation data before building UI
+    if (_shouldShowLoader) {
+      setState(() => isLoading = true);
+    }
+    
     context.read<ReservationBloc>().add(FetchReservationsEvent());
     context.read<RoomBloc>().add(FetchRooms());
-    // _loadEvents();
-    //r
-    // _reservationListener = ever(reservationController.reservationList, (_) {
-    //   if (mounted) _loadEvents();
-    // });
-    await Future.delayed(Duration(milliseconds: 500), () {
+    _dataFetched = true;
+    
+    await Future.delayed(Duration(milliseconds: 300), () {
       setCalenderDates(isFromInit: true);
     });
     if (mounted) setState(() => isLoading = false);
@@ -176,405 +193,527 @@ class CalendarScreenState extends State<CalendarScreen> {
   }
 
   Widget buildCalendarBody() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          SizedBox(height: 10),
-          BlocBuilder<ReservationBloc, ReservationState>(
-            builder: (context, state) {
-              if (state is ReservationLoading) {
-                return Center(child: CircularProgressIndicator());
-              } else if (state is ReservationError) {
-                return Center(child: Text('Error: ${state.message}'));
-              } else if (state is ReservationLoaded) {
-                List<ReservationModel> reservationList = [];
-                state.reservations.forEach(
-                  (e1) {
-                    Map<String, dynamic> map = e1.toMap();
-                    e1.rooms.forEach(
-                      (e2) {
-                        map['roomId'] = e2.id;
-                        map['roomName'] = e2.roomName;
-                        reservationList.add(ReservationModel.fromMap(map));
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Column(
+          children: [
+            SizedBox(height: 10),
+            Expanded(
+              child: BlocBuilder<ReservationBloc, ReservationState>(
+                builder: (context, state) {
+                  if (state is ReservationLoading && _shouldShowLoader) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (state is ReservationError) {
+                    return Center(child: Text('Error: ${state.message}'));
+                  } else if (state is ReservationLoaded) {
+                    List<ReservationModel> reservationList = [];
+                    state.reservations.forEach(
+                      (e1) {
+                        Map<String, dynamic> map = e1.toMap();
+                        e1.rooms.forEach(
+                          (e2) {
+                            map['roomId'] = e2.id;
+                            map['roomName'] = e2.roomName;
+                            reservationList.add(ReservationModel.fromMap(map));
+                          },
+                        );
                       },
                     );
-                  },
-                );
 
-                return SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Sidebar with Month + Room Names
-                      SizedBox(
-                        width: 130,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            GestureDetector(
-                              onTap: onDateTap,
-                              child: SizedBox(
-                                height: 62,
-                                child: Column(
-                                  children: [
-                                    Text("${selectedMonth.year}",
-                                        style: TextStyle(fontSize: 18)),
-                                    Text(
-                                        DateFormat('MMM').format(selectedMonth),
-                                        style: TextStyle(fontSize: 18)),
-                                  ],
+                    return SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Sidebar with Month + Room Names
+                          SizedBox(
+                            width: 130,
+                            child: Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: onDateTap,
+                                  child: Builder(
+                                    builder: (context) {
+                                      final media = MediaQuery.of(context);
+                                      final deviceHeight = media.size.height;
+                                      final textScale = media.textScaleFactor;
+
+                                      // 🔹 Conditions
+                                      bool isSmallDevice =
+                                          deviceHeight < 700; // compact devices
+                                      bool isLargeFont = textScale > 1.1;
+
+                                      // 🔹 Adaptive font size logic
+                                      double fontSize;
+                                      if (isLargeFont && !isSmallDevice) {
+                                        fontSize =
+                                            18; // large font on normal device
+                                      } else if (isLargeFont && isSmallDevice) {
+                                        fontSize =
+                                            11.5; // large font on small device
+                                      } else {
+                                        fontSize = 18; // normal/small font
+                                      }
+                                      return Container(
+                                        height: isSmallDevice || isLargeFont
+                                            ? 60
+                                            : 70,
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "${selectedMonth.year}",
+                                                style: TextStyle(fontSize: 18),
+                                              ),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                DateFormat('MMM')
+                                                    .format(selectedMonth),
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            ),
-                            BlocBuilder<RoomBloc, RoomState>(
-                              builder: (context, state) {
-                                if (state is RoomLoading) {
-                                  return Center(
-                                      child: CircularProgressIndicator());
-                                } else if (state is RoomLoaded) {
-                                  return Column(
-                                    children: state.rooms.map((e) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          showModalBottomSheet(
-                                            context: context,
-                                            builder: (context) => SafeArea(
-                                              child: Container(
-                                                padding: EdgeInsets.all(16),
-                                                decoration: BoxDecoration(
-                                                  color: ColorUtils.white,
-                                                  borderRadius:
-                                                      BorderRadius.vertical(
-                                                    top: Radius.circular(16),
-                                                  ),
-                                                ),
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(StringUtils.rooms),
-                                                    ListTile(
-                                                      title: Text(
-                                                        e.roomName,
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
+                                Expanded(
+                                  child: BlocBuilder<RoomBloc, RoomState>(
+                                    builder: (context, state) {
+                                      if (state is RoomLoading && _shouldShowLoader) {
+                                        return Center(
+                                            child: CircularProgressIndicator());
+                                      } else if (state is RoomLoaded) {
+                                        return ListView(
+                                          children: state.rooms.map((e) {
+                                            return GestureDetector(
+                                              onTap: () {
+                                                showModalBottomSheet(
+                                                  context: context,
+                                                  builder: (context) =>
+                                                      SafeArea(
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.all(16),
+                                                      decoration: BoxDecoration(
+                                                        color: ColorUtils.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .vertical(
+                                                          top: Radius.circular(
+                                                              16),
+                                                        ),
                                                       ),
-                                                      subtitle:
-                                                          Text(e.roomDesc),
-                                                      trailing: Row(
+                                                      child: Column(
                                                         mainAxisSize:
                                                             MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
                                                         children: [
-                                                          IconButton(
-                                                            icon: Icon(
-                                                                Icons.edit,
-                                                                color:
-                                                                    ColorUtils
-                                                                        .blue),
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                              addEditRoomBottomSheet(
-                                                                  context,
-                                                                  room: e);
-                                                            },
+                                                          Text(StringUtils
+                                                              .rooms),
+                                                          ListTile(
+                                                            title: Text(
+                                                              e.roomName,
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                            subtitle: Text(
+                                                                e.roomDesc),
+                                                            trailing: Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              children: [
+                                                                IconButton(
+                                                                  icon: Icon(
+                                                                      Icons
+                                                                          .edit,
+                                                                      color: ColorUtils
+                                                                          .blue),
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                    addEditRoomBottomSheet(
+                                                                        context,
+                                                                        room:
+                                                                            e);
+                                                                  },
+                                                                ),
+                                                                IconButton(
+                                                                  icon: Icon(
+                                                                      Icons
+                                                                          .delete,
+                                                                      color: ColorUtils
+                                                                          .red),
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                    context
+                                                                        .read<
+                                                                            RoomBloc>()
+                                                                        .add(DeleteRoom(
+                                                                            e.id!));
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            ),
                                                           ),
-                                                          IconButton(
-                                                            icon: Icon(
-                                                                Icons.delete,
-                                                                color:
-                                                                    ColorUtils
-                                                                        .red),
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                              context
-                                                                  .read<
-                                                                      RoomBloc>()
-                                                                  .add(DeleteRoom(
-                                                                      e.id!));
-                                                            },
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Container(
+                                                height: 50,
+                                                margin: EdgeInsets.fromLTRB(
+                                                    2, 0, 2, 2),
+                                                decoration: BoxDecoration(
+                                                  color: ColorUtils.green,
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    e.roomName,
+                                                    style: TextStyle(
+                                                        fontSize: 18,
+                                                        color:
+                                                            ColorUtils.white),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        );
+                                      } else if (state is RoomError) {
+                                        return Center(
+                                            child: Text(state.message));
+                                      } else {
+                                        return Center(
+                                            child: Text('No Rooms Available'));
+                                      }
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+
+                          // Calendar Grid
+                          BlocBuilder<RoomBloc, RoomState>(
+                            builder: (context, state) {
+                              if (state is RoomLoaded) {
+                                final media = MediaQuery.of(context);
+                                final deviceHeight = media.size.height;
+                                final textScale = media.textScaleFactor;
+
+                                // 🔹 Conditions
+                                bool isSmallDevice =
+                                    deviceHeight < 700; // compact devices
+                                bool isLargeFont = textScale > 1.1;
+
+                                // 🔹 Adaptive font size logic
+                                double fontSize;
+                                if (isLargeFont && !isSmallDevice) {
+                                  fontSize = 18; // large font on normal device
+                                } else if (isLargeFont && isSmallDevice) {
+                                  fontSize = 11.5; // large font on small device
+                                } else {
+                                  fontSize = 18; // normal/small font
+                                }
+                                final roomList = state.rooms;
+
+                                return Expanded(
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width,
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      controller: scrollController,
+                                      child: Stack(
+                                        clipBehavior: Clip.none,
+                                        children: [
+                                          // ───────── GRID ─────────
+                                          Row(
+                                            children: List.generate(
+                                                calenderDates.length, (index) {
+                                              final textScale =
+                                                  MediaQuery.of(context)
+                                                      .textScaleFactor;
+                                              final date = calenderDates[index];
+                                              final isCurrentDate = DateFormat(
+                                                          "dd-MM-yyyy")
+                                                      .format(date) ==
+                                                  DateFormat("dd-MM-yyyy")
+                                                      .format(DateTime.now());
+
+                                              return Container(
+                                                width: 50,
+                                                child: Column(
+                                                  children: [
+                                                    // Date Header
+                                                    Container(
+                                                      height: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .height <
+                                                                  700 ||
+                                                              MediaQuery.of(
+                                                                          context)
+                                                                      .textScaleFactor >
+                                                                  1.1
+                                                          ? 60
+                                                          : 60,
+                                                      child: FittedBox(
+                                                        fit: BoxFit.scaleDown,
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Text("${date.day}",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        16)),
+                                                            Text(
+                                                              DateFormat("EEE")
+                                                                  .format(date)
+                                                                  .substring(
+                                                                      0, 2),
+                                                              style: TextStyle(
+                                                                  fontSize: 14),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+
+                                                    // Room grid cells
+                                                    Flexible(
+                                                      child: Stack(
+                                                        children: [
+                                                          Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: roomList
+                                                                .map((room) {
+                                                              return Container(
+                                                                height: 50,
+                                                                width: 50,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  border: Border
+                                                                      .all(
+                                                                    color: ColorUtils
+                                                                        .grey
+                                                                        .withOpacity(
+                                                                            0.3),
+                                                                    width: 0.4,
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            }).toList(),
                                                           ),
+                                                          if (isCurrentDate)
+                                                            Positioned.fill(
+                                                              child: Column(
+                                                                children: [
+                                                                  Align(
+                                                                    alignment:
+                                                                        Alignment
+                                                                            .topCenter,
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: const EdgeInsets
+                                                                          .only(
+                                                                          top:
+                                                                              5),
+                                                                      child:
+                                                                          CircleAvatar(
+                                                                        radius:
+                                                                            5,
+                                                                        backgroundColor:
+                                                                            ColorUtils.blue,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    child:
+                                                                        VerticalDivider(
+                                                                      color: ColorUtils
+                                                                          .blue,
+                                                                      width: 2,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
                                                         ],
                                                       ),
                                                     ),
                                                   ],
                                                 ),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        child: Container(
-                                          height: 50,
-                                          margin:
-                                              EdgeInsets.fromLTRB(2, 0, 2, 2),
-                                          decoration: BoxDecoration(
-                                            color: ColorUtils.green,
-                                            borderRadius:
-                                                BorderRadius.circular(5),
+                                              );
+                                            }),
                                           ),
-                                          child: Center(
-                                            child: Text(
-                                              e.roomName,
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: ColorUtils.white),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  );
-                                } else if (state is RoomError) {
-                                  return Center(child: Text(state.message));
-                                } else {
-                                  return Center(
-                                      child: Text('No Rooms Available'));
-                                }
-                              },
-                            )
-                          ],
-                        ),
-                      ),
 
-                      // Calendar Grid
-                      BlocBuilder<RoomBloc, RoomState>(
-                        builder: (context, state) {
-                          if (state is RoomLoaded) {
-                            final roomList = state.rooms;
+                                          // ───────── RESERVATION BARS ─────────
+                                          ...reservationList
+                                              .where((r) => r.roomId != 0)
+                                              .map((reservation) {
+                                            final media =
+                                                MediaQuery.of(context);
+                                            final deviceHeight =
+                                                media.size.height;
+                                            final textScale =
+                                                media.textScaleFactor;
 
-                            return Expanded(
-                              child: SizedBox(
-                                height: (roomList.length + 1) * 52,
-                                width: MediaQuery.of(context).size.width,
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  controller: scrollController,
-                                  child: Stack(
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      // ───────── GRID ─────────
-                                      Row(
-                                        children: List.generate(
-                                            calenderDates.length, (index) {
-                                          final date = calenderDates[index];
-                                          final isCurrentDate =
-                                              DateFormat("dd-MM-yyyy")
-                                                      .format(date) ==
-                                                  DateFormat("dd-MM-yyyy")
-                                                      .format(DateTime.now());
+                                            // 🔹 Conditions
+                                            bool isSmallDevice = deviceHeight <
+                                                700; // e.g. compact screens
+                                            bool isLargeFont = textScale >
+                                                1.1; // accessibility text scaling
 
-                                          return SizedBox(
-                                            width: 50,
-                                            child: Column(
-                                              children: [
-                                                // Date Header
-                                                SizedBox(
-                                                  height: 48.5,
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Text("${date.day}",
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize:
-                                                                      13)),
-                                                      Text(
-                                                        DateFormat("EEE")
-                                                            .format(date)
-                                                            .substring(0, 2),
-                                                        style: const TextStyle(
-                                                            fontSize: 11),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-
-                                                // Room grid cells
-                                                Expanded(
-                                                  child: Stack(
-                                                    children: [
-                                                      Column(
-                                                        children: roomList
-                                                            .map((room) {
-                                                          return Container(
-                                                            height: 51.5,
-                                                            width: 50,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              border:
-                                                                  Border.all(
-                                                                color: ColorUtils
-                                                                    .grey
-                                                                    .withOpacity(
-                                                                        0.3),
-                                                                width: 0.4,
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }).toList(),
-                                                      ),
-                                                      if (isCurrentDate)
-                                                        Positioned.fill(
-                                                          child: Column(
-                                                            children: [
-                                                              Align(
-                                                                alignment:
-                                                                    Alignment
-                                                                        .topCenter,
-                                                                child: Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .only(
-                                                                          top:
-                                                                              5),
-                                                                  child:
-                                                                      CircleAvatar(
-                                                                    radius: 5,
-                                                                    backgroundColor:
-                                                                        ColorUtils
-                                                                            .blue,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              Expanded(
-                                                                child:
-                                                                    VerticalDivider(
-                                                                  color:
-                                                                      ColorUtils
-                                                                          .blue,
-                                                                  width: 2,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }),
-                                      ),
-
-                                      // ───────── RESERVATION BARS ─────────
-                                      ...reservationList
-                                          .where((r) => r.roomId != 0)
-                                          .map((reservation) {
-                                        final inDays =
-                                            DateTime.parse(reservation.checkout)
+                                            // 🔹 Adaptive top logic
+                                            double baseTop =
+                                                isSmallDevice && isLargeFont
+                                                    ? 65.5
+                                                    : 48.5;
+                                            final inDays = DateTime.parse(
+                                                    reservation.checkout)
                                                 .difference(DateTime.parse(
                                                     reservation.checkin))
                                                 .inDays;
 
-                                        final containIndex =
-                                            calenderDates.indexWhere((date) =>
-                                                DateFormat("yyyy-MM-dd")
-                                                    .format(date) ==
-                                                reservation.checkin);
+                                            final containIndex = calenderDates
+                                                .indexWhere((date) =>
+                                                    DateFormat("yyyy-MM-dd")
+                                                        .format(date) ==
+                                                    reservation.checkin);
 
-                                        if (containIndex == -1)
-                                          return const SizedBox();
+                                            if (containIndex == -1)
+                                              return const SizedBox();
 
-                                        final roomIdIndex = roomList.indexWhere(
-                                            (room) =>
-                                                room.id == reservation.roomId);
-                                        if (roomIdIndex == -1)
-                                          return const SizedBox();
+                                            final roomIdIndex =
+                                                roomList.indexWhere((room) =>
+                                                    room.id ==
+                                                    reservation.roomId);
+                                            if (roomIdIndex == -1)
+                                              return const SizedBox();
 
-                                        return Positioned(
-                                          top: ((roomIdIndex + 1) * 51.5) + 3,
-                                          left: (containIndex * 50),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ReservationDetailScreen(
-                                                    reservation: reservation,
+                                            return Positioned(
+                                              top: ((roomIdIndex + 1) *
+                                                      baseTop) +
+                                                  (MediaQuery.of(context)
+                                                                  .size
+                                                                  .height <
+                                                              700 ||
+                                                          MediaQuery.of(context)
+                                                                  .textScaleFactor >
+                                                              1.1
+                                                      ? 12
+                                                      : 12),
+                                              left: (containIndex * 50),
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ReservationDetailScreen(
+                                                        reservation:
+                                                            reservation,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                child: Container(
+                                                  height: 45,
+                                                  width: ((inDays + 1) * 50),
+                                                  decoration: BoxDecoration(
+                                                    color: CommonMethod()
+                                                        .reservationColor(
+                                                            reservation),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withOpacity(0.15),
+                                                        blurRadius: 2,
+                                                        offset:
+                                                            const Offset(1, 1),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ),
-                                              );
-                                            },
-                                            child: Container(
-                                              height: 45,
-                                              width: ((inDays + 1) * 50),
-                                              decoration: BoxDecoration(
-                                                color: CommonMethod()
-                                                    .reservationColor(
-                                                        reservation),
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black
-                                                        .withOpacity(0.15),
-                                                    blurRadius: 2,
-                                                    offset: const Offset(1, 1),
-                                                  ),
-                                                ],
-                                              ),
-                                              alignment: Alignment.center,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 6),
-                                              child: FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                child: Text(
-                                                  reservation.fullname,
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                    color:
-                                                        reservation.balance == 0
+                                                  alignment: Alignment.center,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(horizontal: 6),
+                                                  child: FittedBox(
+                                                    fit: BoxFit.scaleDown,
+                                                    child: Text(
+                                                      reservation.fullname,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: reservation
+                                                                    .balance ==
+                                                                0
                                                             ? ColorUtils.black
                                                             : ColorUtils.white,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ],
+                                            );
+                                          }).toList(),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            );
-                          } else if (state is RoomLoading) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          } else if (state is RoomError) {
-                            return Center(child: Text(state.message));
-                          } else {
-                            return const SizedBox();
-                          }
-                        },
-                      )
-                    ],
-                  ),
-                );
-              } else {
-                return Center(child: Text('No Reservations Found'));
-              }
-            },
-          ),
-        ],
-      ),
+                                );
+                              } else if (state is RoomLoading && _shouldShowLoader) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              } else if (state is RoomError) {
+                                return Center(child: Text(state.message));
+                              } else {
+                                return const SizedBox();
+                              }
+                            },
+                          )
+                        ],
+                      ),
+                    );
+                  } else {
+                    return Center(child: Text('No Reservations Found'));
+                  }
+                },
+              ),
+            )
+          ],
+        );
+      },
     );
   }
 

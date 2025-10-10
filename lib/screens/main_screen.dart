@@ -3,6 +3,10 @@
 /*import '/screens/account_screen.dart';
 import '/screens/app_settings_screen.dart';
 import '/screens/rate_app_screen.dart';*/
+import 'package:bookcomfy/database/db_helper.dart';
+import 'package:bookcomfy/screens/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '/screens/reservation_screen.dart';
 import '/screens/search_reservation.dart';
 import '/screens/settings_screen.dart';
@@ -14,7 +18,8 @@ import 'package:flutter/material.dart';
 import 'calendar_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final bool fromLogin;
+  const MainScreen({super.key, this.fromLogin = false});
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -31,11 +36,27 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     screens = [
-      CalendarScreen(key: calendarKey),
+      CalendarScreen(key: calendarKey, fromLogin: widget.fromLogin),
       TodayScreen(),
       ReservationScreen(),
       SettingsScreen(),
     ];
+  }
+
+  // In your logout function (in the appropriate screen or function)
+  Future<void> logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Set isLoggedIn to false when logging out
+    await prefs.setBool('isLoggedIn', false);
+    await prefs.remove('username');
+    await prefs.remove('userId');
+
+    // Navigate to login screen
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
   }
 
   // final BadgeController badgeController = Get.find<BadgeController>();
@@ -93,20 +114,19 @@ class _MainScreenState extends State<MainScreen> {
           padding: EdgeInsets.zero,
           children: [
             SizedBox(
-          height: 120.0, // Set your desired height here
-          child:
-            DrawerHeader(
-              decoration: BoxDecoration(color: Color(0xFF967969)),
-              child: Text(
-                StringUtils.appTitle,
-                style: TextStyle(
-                  color: ColorUtils.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              height: 120.0, // Set your desired height here
+              child: DrawerHeader(
+                decoration: BoxDecoration(color: Color(0xFF967969)),
+                child: Text(
+                  StringUtils.appTitle,
+                  style: TextStyle(
+                    color: ColorUtils.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
             /*ListTile(
               leading: Icon(Icons.person, color: ColorUtils.green),
               title: Text('My Account'),
@@ -138,13 +158,11 @@ class _MainScreenState extends State<MainScreen> {
             ),
             Divider(),*/
             ListTile(
-              leading: Icon(Icons.logout, color: ColorUtils.red),
-              title: Text('Logout'),
-              onTap: () {
-                Navigator.pop(context);
-                // Add logout functionality
-              },
-            ),
+                leading: Icon(Icons.logout, color: ColorUtils.red),
+                title: Text('Logout'),
+                onTap: () {
+                  logout();
+                }),
           ],
         ),
       ),

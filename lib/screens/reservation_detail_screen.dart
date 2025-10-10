@@ -48,14 +48,13 @@ class _ReservationDetailScreenState extends State<ReservationDetailScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildGuestCount(
-                    Icons.person, StringUtils.adults, widget.reservation.adult),
-                _buildGuestCount(Icons.child_care, StringUtils.children,
-                    widget.reservation.child),
-                _buildGuestCount(
-                    Icons.pets, StringUtils.pets, widget.reservation.pet),
+                _buildGuestCount(Icons.person, StringUtils.adults, widget.reservation.adult),
+                _buildGuestCount(Icons.child_care, StringUtils.children, widget.reservation.child),
+                _buildGuestCount(Icons.pets, StringUtils.pets, widget.reservation.pet),
               ],
             ),
+
+
             Divider(thickness: 1, height: 24),
             _buildPriceRow(
                 StringUtils.ratePerNight, widget.reservation.ratePerNight),
@@ -163,14 +162,24 @@ class _ReservationDetailScreenState extends State<ReservationDetailScreen> {
   }
 
   Widget _buildGuestCount(IconData icon, String label, int count) {
-    return Row(
-      children: [
-        Icon(icon, size: 25, color: ColorUtils.blue),
-        SizedBox(width: 4),
-        Text("$label: $count", style: TextStyle(fontSize: 18)),
-      ],
+    return Expanded(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 25, color: ColorUtils.blue),
+          SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              "$label: $count",
+              style: TextStyle(fontSize: 18),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     );
   }
+
 
   Widget _buildPriceRow(String label, double amount,
       {bool isBold = false, Color? color}) {

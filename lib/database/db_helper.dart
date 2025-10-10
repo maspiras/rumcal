@@ -33,7 +33,8 @@ class DBHelper {
         userId TEXT NOT NULL,
         mobileNumber TEXT NOT NULL,
         password TEXT NOT NULL,
-        role TEXT NOT NULL
+        role TEXT NOT NULL,
+        isLoggedIn INTEGER DEFAULT 0
       );
     ''');
 
@@ -130,8 +131,11 @@ class DBHelper {
     });
   }
 
-  static Future<List<Map<String, dynamic>>> getRooms() async {
+  static Future<List<Map<String, dynamic>>> getRooms([int? userId]) async {
     final db = await database;
+    if (userId != null) {
+      return await db.query('Rooms', where: 'user_id = ?', whereArgs: [userId]);
+    }
     return await db.query('Rooms');
   }
 
@@ -157,8 +161,11 @@ class DBHelper {
     });
   }
 
-  static Future<List<Map<String, dynamic>>> getReservations() async {
+  static Future<List<Map<String, dynamic>>> getReservations([int? userId]) async {
     final db = await database;
+    if (userId != null) {
+      return await db.query('Reservations', where: 'user_id = ?', whereArgs: [userId]);
+    }
     return await db.query('Reservations');
   }
 
@@ -176,5 +183,11 @@ class DBHelper {
     return await db.transaction((txn) async {
       return await txn.rawDelete("DELETE FROM Reservations WHERE id = ?", [id]);
     });
+  }
+
+  // Method to log out the user by clearing SharedPreferences only
+  static Future<void> logout() async {
+    // Only clear SharedPreferences, keep database data intact
+    // Data will be filtered by user_id on next login
   }
 }

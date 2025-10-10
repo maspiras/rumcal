@@ -1,8 +1,10 @@
+import 'package:bookcomfy/blocs/room/room_state.dart';
+
 import '/database/db_helper.dart';
 import '/model/room_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'room_event.dart';
-import 'room_state.dart';
 
 class RoomBloc extends Bloc<RoomEvent, RoomState> {
   RoomBloc() : super(RoomInitial()) {
@@ -15,7 +17,9 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   Future<void> _onFetchRooms(FetchRooms event, Emitter<RoomState> emit) async {
     emit(RoomLoading());
     try {
-      final rooms = await DBHelper.getRooms();
+      final prefs = await SharedPreferences.getInstance();
+      final userId = int.tryParse(prefs.getString('userId') ?? '0') ?? 0;
+      final rooms = await DBHelper.getRooms(userId > 0 ? userId : null);
       final roomList = rooms.map((e) => RoomModel.fromMap(e)).toList();
       emit(RoomLoaded(roomList));
     } catch (e) {
@@ -26,9 +30,15 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   Future<void> _onAddRoom(AddRoom event, Emitter<RoomState> emit) async {
     emit(RoomLoading());
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = int.tryParse(prefs.getString('userId') ?? '0') ?? 0;
+
+      final roomData = event.room.toMap();
+      roomData['user_id'] = userId; // Set current user ID
+
       await DBHelper.database.then((db) async {
         await db.transaction((txn) async {
-          await txn.insert('Rooms', event.room.toMap());
+          await txn.insert('Rooms', roomData);
         });
       });
       add(FetchRooms());

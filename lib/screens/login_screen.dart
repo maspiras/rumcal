@@ -155,7 +155,7 @@ class LoginScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(StringUtils.loginSuccess)));
                   Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => MainScreen()),
+                    MaterialPageRoute(builder: (context) => MainScreen(fromLogin: true)),
                   );
                 } else if (state is LoginFailure) {
                   ScaffoldMessenger.of(context)
