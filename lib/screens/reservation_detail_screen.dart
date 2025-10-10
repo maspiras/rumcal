@@ -21,130 +21,137 @@ class _ReservationDetailScreenState extends State<ReservationDetailScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(StringUtils.reservationDetails)),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Text(
-                widget.reservation.fullname,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SizedBox(height: 10),
-            _buildInfoRow(Icons.phone,
-                "${StringUtils.phoneLabel}: ${widget.reservation.phone}"),
-            _buildInfoRow(Icons.email,
-                "${StringUtils.emailLabel}: ${widget.reservation.email}"),
-            _buildInfoRow(Icons.calendar_today,
-                "${StringUtils.checkIn}: ${widget.reservation.checkin}"),
-            _buildInfoRow(Icons.calendar_today,
-                "${StringUtils.checkOut}: ${widget.reservation.checkout}"),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildGuestCount(Icons.person, StringUtils.adults, widget.reservation.adult),
-                _buildGuestCount(Icons.child_care, StringUtils.children, widget.reservation.child),
-                _buildGuestCount(Icons.pets, StringUtils.pets, widget.reservation.pet),
+                Center(
+                  child: Text(
+                    widget.reservation.fullname,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+                _buildInfoRow(Icons.phone,
+                    "${StringUtils.phoneLabel}: ${widget.reservation.phone}"),
+                _buildInfoRow(Icons.email,
+                    "${StringUtils.emailLabel}: ${widget.reservation.email}"),
+                _buildInfoRow(Icons.calendar_today,
+                    "${StringUtils.checkIn}: ${widget.reservation.checkin}"),
+                _buildInfoRow(Icons.calendar_today,
+                    "${StringUtils.checkOut}: ${widget.reservation.checkout}"),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildGuestCount(Icons.person, StringUtils.adults,
+                        widget.reservation.adult),
+                    _buildGuestCount(Icons.child_care, StringUtils.children,
+                        widget.reservation.child),
+                    _buildGuestCount(
+                        Icons.pets, StringUtils.pets, widget.reservation.pet),
+                  ],
+                ),
+                Divider(thickness: 1, height: 24),
+                _buildPriceRow(
+                    StringUtils.ratePerNight, widget.reservation.ratePerNight),
+                _buildPriceRow(
+                    StringUtils.subtotal, widget.reservation.subtotal),
+                _buildPriceRow(StringUtils.tax, widget.reservation.tax),
+                _buildPriceRow(
+                    StringUtils.discount, widget.reservation.discount),
+                _buildPriceRow(
+                  StringUtils.grandTotal,
+                  widget.reservation.grandTotal,
+                  isBold: true,
+                ),
+                _buildPriceRow(
+                    StringUtils.prepayment, widget.reservation.prepayment),
+                _buildPriceRow(
+                  StringUtils.balance,
+                  widget.reservation.balance,
+                  isBold: true,
+                  color: ColorUtils.red,
+                ),
+                SizedBox(
+                  height: 50,
+                ),
+                Center(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              border:
+                                  Border.all(color: ColorUtils.grey, width: 1),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Center(
+                                child: Text(
+                                  StringUtils.back,
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 30,
+                      ),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () async {
+                            final result = await addEditReservationBottomSheet(
+                                context,
+                                reservation: widget.reservation);
+                            if (result != null) {
+                              setState(() {
+                                widget.reservation = result;
+                              });
+                            }
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: ColorUtils.blue,
+                              borderRadius: BorderRadius.circular(30),
+                              border:
+                                  Border.all(color: ColorUtils.grey, width: 1),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Center(
+                                child: Text(
+                                  StringUtils.edit,
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: ColorUtils.white),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
-
-
-            Divider(thickness: 1, height: 24),
-            _buildPriceRow(
-                StringUtils.ratePerNight, widget.reservation.ratePerNight),
-            _buildPriceRow(StringUtils.subtotal, widget.reservation.subtotal),
-            _buildPriceRow(StringUtils.tax, widget.reservation.tax),
-            _buildPriceRow(StringUtils.discount, widget.reservation.discount),
-            _buildPriceRow(
-              StringUtils.grandTotal,
-              widget.reservation.grandTotal,
-              isBold: true,
-            ),
-            _buildPriceRow(
-                StringUtils.prepayment, widget.reservation.prepayment),
-            _buildPriceRow(
-              StringUtils.balance,
-              widget.reservation.balance,
-              isBold: true,
-              color: ColorUtils.red,
-            ),
-            SizedBox(
-              height: 50,
-            ),
-            Center(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: ColorUtils.grey, width: 1),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Center(
-                            child: Text(
-                              StringUtils.back,
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 30,
-                  ),
-                  Expanded(
-                    child: InkWell(
-                      onTap: () async {
-                        final result = await addEditReservationBottomSheet(
-                            context,
-                            reservation: widget.reservation);
-                        if (result != null) {
-                          setState(() {
-                            widget.reservation = result;
-                          });
-                        }
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: ColorUtils.blue,
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: ColorUtils.grey, width: 1),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Center(
-                            child: Text(
-                              StringUtils.edit,
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: ColorUtils.white),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
+          )),
     );
   }
 
@@ -179,7 +186,6 @@ class _ReservationDetailScreenState extends State<ReservationDetailScreen> {
       ),
     );
   }
-
 
   Widget _buildPriceRow(String label, double amount,
       {bool isBold = false, Color? color}) {
