@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_function_literals_in_foreach_calls, curly_braces_in_flow_control_structures, deprecated_member_use, unnecessary_to_list_in_spreads
+// ignore_for_file: library_private_types_in_public_api, avoid_function_literals_in_foreach_calls, curly_braces_in_flow_control_structures, deprecated_member_use, unnecessary_to_list_in_spreads, unused_local_variable
 import '/blocs/reservation/reservation__bloc.dart';
 import '/blocs/reservation/reservation__event.dart';
 import '/blocs/reservation/reservation__state.dart';
@@ -254,7 +254,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                                       } else {
                                         fontSize = 18; // normal/small font
                                       }
-                                      return Container(
+                                      return SizedBox(
                                         height: isSmallDevice || isLargeFont
                                             ? 60
                                             : 70,
@@ -382,7 +382,9 @@ class CalendarScreenState extends State<CalendarScreen> {
                                                 margin: EdgeInsets.fromLTRB(
                                                     2, 0, 2, 2),
                                                 decoration: BoxDecoration(
-                                                  color: ColorUtils.green,
+                                                  //color: ColorUtils.green,
+                                                  //color: Theme.of(context).colorScheme.secondary(),
+                                                  color: Color(0xFF967969),
                                                   borderRadius:
                                                       BorderRadius.circular(5),
                                                 ),
@@ -460,12 +462,12 @@ class CalendarScreenState extends State<CalendarScreen> {
                                                   DateFormat("dd-MM-yyyy")
                                                       .format(DateTime.now());
 
-                                              return Container(
+                                              return SizedBox(
                                                 width: 50,
                                                 child: Column(
                                                   children: [
                                                     // Date Header
-                                                    Container(
+                                                    SizedBox(
                                                       height: MediaQuery.of(
                                                                           context)
                                                                       .size

@@ -1,4 +1,4 @@
-// ignore_for_file: invalid_use_of_protected_member, unnecessary_to_list_in_spreads
+// ignore_for_file: invalid_use_of_protected_member, unnecessary_to_list_in_spreads, deprecated_member_use
 
 import '/blocs/reservation/reservation__bloc.dart';
 import '/blocs/reservation/reservation__state.dart';
