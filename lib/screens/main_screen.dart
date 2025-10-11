@@ -91,7 +91,7 @@ class _MainScreenState extends State<MainScreen> {
           if (currentIndex == 0)
             IconButton(
               onPressed: () {
-                calendarKey.currentState?.scrollToToday();
+                // calendarKey.currentState?.scrollToToday();
               },
               icon: Icon(Icons.calendar_today),
             ),
