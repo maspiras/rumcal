@@ -40,6 +40,11 @@ class _MainScreenState extends State<MainScreen> {
       ReservationScreen(),
       SettingsScreen(),
     ];
+
+    // After first frame, jump to today without animation
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      calendarKey.currentState?.scrollToToday(animate: false);
+    });
   }
 
   // In your logout function (in the appropriate screen or function)
@@ -91,7 +96,7 @@ class _MainScreenState extends State<MainScreen> {
           if (currentIndex == 0)
             IconButton(
               onPressed: () {
-                // calendarKey.currentState?.scrollToToday();
+                calendarKey.currentState?.scrollToToday();
               },
               icon: Icon(Icons.calendar_today),
             ),

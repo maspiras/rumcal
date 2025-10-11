@@ -1995,6 +1995,46 @@ class CalendarScreenState extends State<CalendarScreen> {
     });
   }
 
+  // Jump/scroll to today's column and keep header+body in sync
+  void scrollToToday({bool animate = true}) {
+    final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    // Find today's index in current buffer
+    int idx = calenderDates.indexWhere(
+      (d) => DateFormat('yyyy-MM-dd').format(d) == todayStr,
+    );
+
+    // If not present, rebuild dates centered around today then jump again
+    if (idx == -1) {
+      calenderCenterDate = DateTime.now();
+      _buildDates();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollToToday(animate: false);
+      });
+      return;
+    }
+
+    final double offset = idx * kCellWidth;
+
+    // Header & body ko same offset par le aao
+    if (_hHeader.hasClients) {
+      animate
+          ? _hHeader.animateTo(offset,
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOut)
+          : _hHeader.jumpTo(offset);
+    }
+    if (_hBody.hasClients) {
+      animate
+          ? _hBody.animateTo(offset,
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOut)
+          : _hBody.jumpTo(offset);
+    }
+
+    _updateSelectedMonth(offset);
+  }
+
   // ── UI ──────────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
@@ -2062,17 +2102,25 @@ class CalendarScreenState extends State<CalendarScreen> {
                               Container(
                                 width: kRoomListWidth,
                                 alignment: Alignment.center,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('${selectedMonth.year}',
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600)),
-                                    Text(
-                                        DateFormat('MMM').format(selectedMonth),
-                                        style: const TextStyle(fontSize: 14)),
-                                  ],
+                                child: Center(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text('${selectedMonth.year}',
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600)),
+                                        Text(
+                                            DateFormat('MMM')
+                                                .format(selectedMonth),
+                                            style:
+                                                const TextStyle(fontSize: 14)),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
                               Expanded(
@@ -2097,23 +2145,28 @@ class CalendarScreenState extends State<CalendarScreen> {
                                               ),
                                             ),
                                           ),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text('${date.day}',
-                                                  style: const TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.w600)),
-                                              Text(
-                                                DateFormat('EEE')
-                                                    .format(date)
-                                                    .substring(0, 2),
-                                                style: const TextStyle(
-                                                    fontSize: 13),
+                                          child: Center(
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text('${date.day}',
+                                                      style: const TextStyle(
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.w600)),
+                                                  Text(
+                                                    DateFormat('EEE')
+                                                        .format(date)
+                                                        .substring(0, 2),
+                                                    style: const TextStyle(
+                                                        fontSize: 13),
+                                                  ),
+                                                ],
                                               ),
-                                            ],
+                                            ),
                                           ),
                                         );
                                       }),
@@ -2289,6 +2342,11 @@ class CalendarScreenState extends State<CalendarScreen> {
                                                   decoration: BoxDecoration(
                                                     color: CommonMethod()
                                                         .reservationColor(r),
+                                                    border: Border.all(
+                                                        color: Colors.grey
+                                                            .withValues(
+                                                                alpha: 0.6),
+                                                        width: 1),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             50),
