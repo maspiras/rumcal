@@ -1,3 +1,5 @@
+// ignore_for_file: dangling_library_doc_comments
+
 /*
 // ignore_for_file: library_private_types_in_public_api, avoid_function_literals_in_foreach_calls, curly_braces_in_flow_control_structures, deprecated_member_use, unnecessary_to_list_in_spreads, unused_local_variable
 import '/blocs/reservation/reservation__bloc.dart';
@@ -2043,7 +2045,7 @@ class CalendarScreenState extends State<CalendarScreen> {
         bottomSafe + 76; // keep last row above bottom bar/FAB
 
     // same half-gap on top so the first room gets spacing like others
-    const double _topLead = kRowGap / 2;
+    const double topLead = kRowGap / 2;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Calendar')),
@@ -2139,8 +2141,8 @@ class CalendarScreenState extends State<CalendarScreen> {
                                           decoration: BoxDecoration(
                                             border: Border(
                                               right: BorderSide(
-                                                color:
-                                                    Colors.grey.withOpacity(.3),
+                                                color: Colors.grey
+                                                    .withValues(alpha: 0.3),
                                                 width: .6,
                                               ),
                                             ),
@@ -2189,21 +2191,21 @@ class CalendarScreenState extends State<CalendarScreen> {
                                   controller: _vLeft,
                                   child: Padding(
                                     padding:
-                                        const EdgeInsets.only(top: _topLead),
+                                        const EdgeInsets.only(top: topLead),
                                     child: Stack(
                                       children: [
                                         SizedBox(
                                           width: kRoomListWidth,
                                           height: gridHeight +
                                               extraBottomPadding +
-                                              _topLead, // extend painter
+                                              topLead, // extend painter
                                           child: CustomPaint(
                                             painter: _LeftPanelPainter(
                                               rows: totalRows,
                                               rowHeight: kRowHeight,
                                               rowGap: kRowGap,
-                                              lineColor:
-                                                  Colors.grey.withOpacity(.3),
+                                              lineColor: Colors.grey
+                                                  .withValues(alpha: .3),
                                               lineWidth: kGridStroke,
                                             ),
                                           ),
@@ -2253,7 +2255,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                                     scrollDirection: Axis.horizontal,
                                     child: Padding(
                                       padding:
-                                          const EdgeInsets.only(top: _topLead),
+                                          const EdgeInsets.only(top: topLead),
                                       child: Stack(
                                         clipBehavior: Clip.none,
                                         children: [
@@ -2262,7 +2264,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                                             width: gridWidth,
                                             height: gridHeight +
                                                 extraBottomPadding +
-                                                _topLead,
+                                                topLead,
                                             child: CustomPaint(
                                               painter: _JointGridPainter(
                                                 rows: totalRows,
@@ -2270,8 +2272,8 @@ class CalendarScreenState extends State<CalendarScreen> {
                                                 rowHeight: kRowHeight,
                                                 rowGap: kRowGap,
                                                 colWidth: kCellWidth,
-                                                lineColor:
-                                                    Colors.grey.withOpacity(.3),
+                                                lineColor: Colors.grey
+                                                    .withValues(alpha: .3),
                                                 lineWidth: kGridStroke,
                                               ),
                                             ),
@@ -2288,8 +2290,9 @@ class CalendarScreenState extends State<CalendarScreen> {
                                                       .format(d) ==
                                                   r.checkin,
                                             );
-                                            if (start == -1)
+                                            if (start == -1) {
                                               return const SizedBox.shrink();
+                                            }
 
                                             final span = DateTime.parse(
                                                     r.checkout)
@@ -2299,8 +2302,9 @@ class CalendarScreenState extends State<CalendarScreen> {
 
                                             final rowIndex = rooms.indexWhere(
                                                 (rm) => rm.id == r.roomId);
-                                            if (rowIndex == -1)
+                                            if (rowIndex == -1) {
                                               return const SizedBox.shrink();
+                                            }
 
                                             final double bandTop =
                                                 rowIndex * kRowPitch +
@@ -2371,7 +2375,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                                                 ),
                                               ),
                                             );
-                                          }).toList(),
+                                          }),
 
                                           // Today vertical guideline (full height)
                                           if (todayIndex != -1)
