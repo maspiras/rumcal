@@ -126,20 +126,24 @@ class _TransactionScreenState extends State<TransactionScreen> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        entry.key,
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: ColorUtils.blue,
+                                      Expanded(
+                                        child: Text(
+                                          entry.key,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: ColorUtils.blue,
+                                          ),
                                         ),
                                       ),
-                                      Text(
-                                        "\$ ${groupTotal.toStringAsFixed(2)}",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.blue,
+                                      Expanded(
+                                        child: Text(
+                                          "\$ ${groupTotal.toStringAsFixed(2)}",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.blue,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -251,7 +255,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
       if (!grouped.containsKey(groupKey)) {
         grouped[groupKey] = [];
       }
-      
+
       String fullname = item.fullname;
       int maxLength = 20;
 
@@ -263,7 +267,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
       grouped[groupKey]!.add({
         "date": DateFormat("dd MMM yyyy").format(checkoutDate),
         "amount": (item.grandTotal as num).toDouble(),
-        "guest": fullname , // Make sure `fullName` exists in your model
+        "guest": fullname, // Make sure `fullName` exists in your model
       });
     }
 

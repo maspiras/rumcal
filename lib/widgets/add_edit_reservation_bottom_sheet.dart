@@ -684,6 +684,9 @@
 // ignore_for_file: invalid_use_of_protected_member
 
 // import '/controller/reservation_controller.dart';
+import 'package:bookcomfy/screens/calendar_screen.dart';
+import 'package:bookcomfy/screens/main_screen.dart';
+
 import '/blocs/reservation/reservation__bloc.dart';
 import '/blocs/reservation/reservation__event.dart';
 import '/blocs/room/room_bloc.dart';
@@ -779,11 +782,11 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
     /// ✅ **Pre-fill data when editing a reservation**
     if (reservation != null) {
       roomController.text = widget.reservation?.rooms
-          .map(
-            (e) => e.roomName,
-      )
-          .toList()
-          .join(",") ??
+              .map(
+                (e) => e.roomName,
+              )
+              .toList()
+              .join(",") ??
           "";
       checkinController.text = reservation!.checkin;
       checkoutController.text = reservation!.checkout;
@@ -823,43 +826,116 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
   }
 
   /// ✅ **Pick a date and validate it**
+  // Future<void> selectDate(BuildContext context, bool isCheckIn) async {
+  //   DateTime initialDate = isCheckIn
+  //       ? DateTime.now() // Check-in starts today
+  //       : checkinDate ??
+  //           DateTime.now()
+  //               .add(Duration(days: 1)); // Check-out starts after check-in
+  //
+  //   DateTime firstDate = isCheckIn
+  //       ? DateTime.now() // Check-in cannot be before today
+  //       // ? DateTime(1999) // Check-in cannot be before today
+  //       : checkinDate ?? DateTime.now(); // Check-out must be after check-in
+  //
+  //   DateTime? pickedDate = await showDatePicker(
+  //     context: context,
+  //     initialDate: initialDate,
+  //     firstDate: firstDate,
+  //     lastDate: DateTime(2100),
+  //   );
+  //
+  //   if (pickedDate != null) {
+  //     if (isCheckIn) {
+  //       checkinDate = pickedDate;
+  //       checkinController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+  //
+  //       // Auto-reset checkout if it's before the check-in
+  //       if (checkoutDate != null && checkoutDate!.isBefore(checkinDate!)) {
+  //         checkoutDate = checkinDate!.add(Duration(days: 1));
+  //         checkoutController.text =
+  //             DateFormat('yyyy-MM-dd').format(checkoutDate!);
+  //       }
+  //       calculateTotal();
+  //     } else {
+  //       checkoutDate = pickedDate;
+  //       checkoutController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+  //       calculateTotal();
+  //     }
+  //   }
+  // }
+  DateTime? _tryParseYMD(String s) {
+    if (s.isEmpty) return null;
+    try {
+      return DateTime.parse(s); // expects 'yyyy-MM-dd'
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> selectDate(BuildContext context, bool isCheckIn) async {
-    DateTime initialDate = isCheckIn
-        ? DateTime.now() // Check-in starts today
-        : checkinDate ??
-        DateTime.now()
-            .add(Duration(days: 1)); // Check-out starts after check-in
+    final now = DateTime.now();
 
-    DateTime firstDate = isCheckIn
-        ? DateTime.now() // Check-in cannot be before today
-    // ? DateTime(1999) // Check-in cannot be before today
-        : checkinDate ?? DateTime.now(); // Check-out must be after check-in
+    // read currently saved values (shown in the textfields)
+    final savedCheckIn = _tryParseYMD(checkinController.text);
+    final savedCheckOut = _tryParseYMD(checkoutController.text);
 
-    DateTime? pickedDate = await showDatePicker(
+    // decide the initial date the picker should show
+    DateTime initialDate;
+    if (isCheckIn) {
+      initialDate = savedCheckIn ?? now;
+    } else {
+      initialDate = savedCheckOut ??
+          (savedCheckIn != null
+              ? savedCheckIn.add(const Duration(days: 1))
+              : now.add(const Duration(days: 1)));
+    }
+
+    // decide lower bound (keep your business rule)
+    DateTime firstDate;
+    if (isCheckIn) {
+      firstDate = DateTime(
+          now.year, now.month, now.day); // check-in cannot be before today
+    } else {
+      firstDate = savedCheckIn != null
+          ? DateTime(savedCheckIn.year, savedCheckIn.month, savedCheckIn.day)
+          : DateTime(
+              now.year, now.month, now.day); // checkout >= checkin (or today)
+    }
+
+    // ensure firstDate <= initialDate to avoid picker asserting and defaulting to today
+    if (initialDate.isBefore(firstDate)) {
+      firstDate = initialDate;
+    }
+
+    final picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: firstDate,
       lastDate: DateTime(2100),
     );
 
-    if (pickedDate != null) {
-      if (isCheckIn) {
-        checkinDate = pickedDate;
-        checkinController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+    if (picked == null) return;
 
-        // Auto-reset checkout if it's before the check-in
-        if (checkoutDate != null && checkoutDate!.isBefore(checkinDate!)) {
-          checkoutDate = checkinDate!.add(Duration(days: 1));
-          checkoutController.text =
-              DateFormat('yyyy-MM-dd').format(checkoutDate!);
-        }
-        calculateTotal();
-      } else {
-        checkoutDate = pickedDate;
-        checkoutController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
-        calculateTotal();
+    final pickedStr = DateFormat('yyyy-MM-dd').format(picked);
+
+    if (isCheckIn) {
+      checkinDate = picked;
+      checkinController.text = pickedStr;
+
+      // if checkout is set but now before/== checkin, push it to +1 day
+      if (checkoutDate != null && !checkoutDate!.isAfter(checkinDate!)) {
+        checkoutDate = checkinDate!.add(const Duration(days: 1));
+        checkoutController.text =
+            DateFormat('yyyy-MM-dd').format(checkoutDate!);
       }
+    } else {
+      checkoutDate = picked;
+      checkoutController.text = pickedStr;
     }
+
+    // recompute totals if you rely on dates
+    calculateTotal();
   }
 
   /// ✅ **Calculates Tax, Grand Total & Balance**
@@ -932,25 +1008,39 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
                 children: [
                   Row(
                     children: [
+                      // back button (fixed width)
                       InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Icon(
-                            Icons.arrow_back_outlined,
-                            color: ColorUtils.black,
-                          )),
-                      Spacer(),
-                      Text(
-                        reservation == null
-                            ? StringUtils.addReservation
-                            : StringUtils.editReservation,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                        onTap: () => Navigator.pop(context),
+                        child: const Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Icon(Icons.arrow_back_outlined,
+                              color: Colors.black),
+                        ),
                       ),
-                      Spacer(),
+
+                      // title takes remaining space, centered, ellipsis on small screens
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            reservation == null
+                                ? StringUtils.addReservation
+                                : StringUtils.editReservation,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: false,
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+
+                      // trailing spacer with same width as leading icon, to keep text truly centered
+                      const SizedBox(
+                          width:
+                              48), // ~ icon area (8 padding + 24 icon + 8 padding)
                     ],
                   ),
+
                   SizedBox(height: 20),
                   Padding(
                     padding: EdgeInsets.only(bottom: 8),
@@ -967,7 +1057,7 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
                           labelText: StringUtils.room,
                           border: OutlineInputBorder()),
                       validator: (value) =>
-                      value!.isEmpty ? StringUtils.selectRoom : null,
+                          value!.isEmpty ? StringUtils.selectRoom : null,
                     ),
                   ),
                   _buildTextField(
@@ -975,17 +1065,17 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
                     StringUtils.fullName,
                     keyboardType: TextInputType.text,
                     validator: (value) =>
-                    value!.isEmpty ? StringUtils.enterFullName : null,
+                        value!.isEmpty ? StringUtils.enterFullName : null,
                   ),
                   _buildTextField(phoneController, StringUtils.phone,
                       keyboardType: TextInputType.phone, validator: (value) {
-                        /*if (value!.isEmpty) {
+                    /*if (value!.isEmpty) {
                       return StringUtils.enterMobileNumber;
                     } else if (value.length < 10 || value.length > 10) {
                       return StringUtils.phoneDigits;
                     }*/
-                        return null;
-                      }),
+                    return null;
+                  }),
                   _buildTextField(
                     emailController,
                     StringUtils.email,
@@ -1011,13 +1101,13 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
                           child: _buildDateField(
                               StringUtils.checkinDate,
                               checkinController,
-                                  () => selectDate(context, true))),
+                              () => selectDate(context, true))),
                       SizedBox(width: 20),
                       Expanded(
                           child: _buildDateField(
                               StringUtils.checkoutDate,
                               checkoutController,
-                                  () => selectDate(context, false))),
+                              () => selectDate(context, false))),
                     ],
                   ),
                   SizedBox(height: 20),
@@ -1027,28 +1117,28 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
                     StringUtils.ratePerNight,
                     keyboardType: TextInputType.number,
                     validator: (value) =>
-                    value!.isEmpty ? StringUtils.enterRatePerNight : null,
+                        value!.isEmpty ? StringUtils.enterRatePerNight : null,
                   ),
                   _buildTextField(
                     discountController,
                     StringUtils.discount,
                     keyboardType: TextInputType.number,
                     validator: (value) =>
-                    value!.isEmpty ? StringUtils.enterDiscount : null,
+                        value!.isEmpty ? StringUtils.enterDiscount : null,
                   ),
                   _buildTextField(
                     prepaymentController,
                     StringUtils.prepayment,
                     keyboardType: TextInputType.number,
                     validator: (value) =>
-                    value!.isEmpty ? StringUtils.enterPrepayment : null,
+                        value!.isEmpty ? StringUtils.enterPrepayment : null,
                   ),
                   _buildTextField(
                     taxPercentController,
                     "${StringUtils.tax} %",
                     keyboardType: TextInputType.number,
                     validator: (value) =>
-                    value!.isEmpty ? "Enter tax percentage" : null,
+                        value!.isEmpty ? "Enter tax percentage" : null,
                   ),
 
                   SizedBox(height: 10),
@@ -1078,155 +1168,159 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
                     onPressed: isLoading
                         ? null
                         : () async {
-                      if (formKey.currentState!.validate()) {
-                        final checkIn =
-                        DateTime.parse(checkinController.text);
-                        final checkOut =
-                        DateTime.parse(checkoutController.text);
-                        if (checkIn.isAtSameMomentAs(checkOut)) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(StringUtils.dateError),
-                              backgroundColor: ColorUtils.blue,
-                              duration: Duration(seconds: 3),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
+                            if (formKey.currentState!.validate()) {
+                              final checkIn =
+                                  DateTime.parse(checkinController.text);
+                              final checkOut =
+                                  DateTime.parse(checkoutController.text);
+                              if (checkIn.isAtSameMomentAs(checkOut)) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(StringUtils.dateError),
+                                    backgroundColor: ColorUtils.blue,
+                                    duration: Duration(seconds: 3),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
 
-                          return;
-                        }
-                        final reservations = context
-                            .read<ReservationBloc>()
-                            .state
-                            .reservations;
+                                return;
+                              }
+                              final reservations = context
+                                  .read<ReservationBloc>()
+                                  .state
+                                  .reservations;
 
-                        final isContain = reservations.any((element) {
-                          final elementCheckIn =
-                          DateTime.parse(element.checkin);
-                          final elementCheckOut =
-                          DateTime.parse(element.checkout);
+                              final isContain = reservations.any((element) {
+                                final elementCheckIn =
+                                    DateTime.parse(element.checkin);
+                                final elementCheckOut =
+                                    DateTime.parse(element.checkout);
 
-                          return (
-                              // Case 1: New check-in within an existing reservation
-                              ((checkIn.isAfter(elementCheckIn) ||
-                                  checkIn.isAtSameMomentAs(
-                                      elementCheckIn)) &&
-                                  (checkOut.isBefore(elementCheckOut) ||
-                                      checkOut.isAtSameMomentAs(
-                                          elementCheckOut))) ||
+                                return (
+                                        // Case 1: New check-in within an existing reservation
+                                        ((checkIn.isAfter(elementCheckIn) ||
+                                                    checkIn.isAtSameMomentAs(
+                                                        elementCheckIn)) &&
+                                                (checkOut.isBefore(elementCheckOut) ||
+                                                    checkOut.isAtSameMomentAs(
+                                                        elementCheckOut))) ||
 
-                                  // Case 2: New check-out overlaps with existing reservation
-                                  (checkOut.isAfter(elementCheckIn) &&
-                                      (checkOut.isBefore(
-                                          elementCheckOut) ||
-                                          checkOut.isAtSameMomentAs(
-                                              elementCheckOut))) ||
+                                            // Case 2: New check-out overlaps with existing reservation
+                                            (checkOut.isAfter(elementCheckIn) &&
+                                                (checkOut.isBefore(
+                                                        elementCheckOut) ||
+                                                    checkOut.isAtSameMomentAs(
+                                                        elementCheckOut))) ||
 
-                                  // Case 3: New check-in is inside existing reservation range
-                                  ((checkIn.isAfter(elementCheckIn) ||
-                                      checkIn.isAtSameMomentAs(
-                                          elementCheckIn)) &&
-                                      checkIn.isBefore(
-                                          elementCheckOut)) ||
+                                            // Case 3: New check-in is inside existing reservation range
+                                            ((checkIn.isAfter(elementCheckIn) ||
+                                                    checkIn.isAtSameMomentAs(
+                                                        elementCheckIn)) &&
+                                                checkIn.isBefore(
+                                                    elementCheckOut)) ||
 
-                                  // Case 4: New reservation fully contains existing reservation
-                                  (elementCheckIn.isAfter(checkIn) &&
-                                      elementCheckOut
-                                          .isBefore(checkOut))) &&
-                              // Room overlap condition
-                              element.rooms
-                                  .where((e1) => selectedRoomsList
-                                  .any((e2) => e2.id == e1.id))
-                                  .isNotEmpty &&
-                              reservation?.id != element.id;
-                        });
-                        // // Get.snackbar(
-                        // //   'Room is Alredy booked', '',
-                        // //   backgroundColor: ColorUtils.blue,
-                        // //   duration: Duration(seconds: 3),
-                        // //   snackPosition: SnackPosition.BOTTOM,
-                        // //   // behavior: SnackBarBehavior.floating,
-                        // // );
-                        // ScaffoldMessenger.of(context).showSnackBar(
-                        //     SnackBar(
-                        //         content: Text(StringUtils.loginSuccess)));
-                        if (isContain) {
-                          Get.snackbar(
-                            StringUtils.attention,
-                            StringUtils.roomBooked,
-                            backgroundColor: ColorUtils.blue,
-                            snackPosition: SnackPosition.BOTTOM,
-                            duration: Duration(seconds: 3),
-                          );
-                          // ScaffoldMessenger.of(context).showSnackBar(
-                          //   SnackBar(
-                          //     content: Text(StringUtils.overlapDateError),
-                          //     backgroundColor: ColorUtils.blue,
-                          //     duration: Duration(seconds: 3),
-                          //     behavior: SnackBarBehavior.floating,
-                          //   ),
-                          // );
-                          return;
-                        }
-                        setState(() => isLoading = true);
-                        ReservationModel newReservation =
-                        ReservationModel(
-                            userId: 1,
-                            // Replace with actual user ID logic
-                            checkin: checkinController.text,
-                            checkout: checkoutController.text,
-                            fullname: fullnameController.text,
-                            phone: phoneController.text,
-                            email: emailController.text,
-                            adult: adultCount,
-                            child: childCount,
-                            pet: petCount,
-                            ratePerNight:
-                            double.parse(rateController.text),
-                            subtotal: subtotal,
-                            discount:
-                            double.parse(discountController.text),
-                            taxPercent: double.parse(
-                                taxPercentController.text),
-                            tax: tax,
-                            grandTotal: grandTotal,
-                            prepayment: double.parse(
-                                prepaymentController.text),
-                            balance: balance,
-                            roomId: selectedRoom?.id ?? 0,
-                            roomName: selectedRoom?.roomName ?? "",
-                            rooms: selectedRoomsList);
+                                            // Case 4: New reservation fully contains existing reservation
+                                            (elementCheckIn.isAfter(checkIn) &&
+                                                elementCheckOut
+                                                    .isBefore(checkOut))) &&
+                                    // Room overlap condition
+                                    element.rooms
+                                        .where((e1) => selectedRoomsList
+                                            .any((e2) => e2.id == e1.id))
+                                        .isNotEmpty &&
+                                    reservation?.id != element.id;
+                              });
+                              // // Get.snackbar(
+                              // //   'Room is Alredy booked', '',
+                              // //   backgroundColor: ColorUtils.blue,
+                              // //   duration: Duration(seconds: 3),
+                              // //   snackPosition: SnackPosition.BOTTOM,
+                              // //   // behavior: SnackBarBehavior.floating,
+                              // // );
+                              // ScaffoldMessenger.of(context).showSnackBar(
+                              //     SnackBar(
+                              //         content: Text(StringUtils.loginSuccess)));
+                              if (isContain) {
+                                Get.snackbar(
+                                  StringUtils.attention,
+                                  StringUtils.roomBooked,
+                                  backgroundColor: ColorUtils.blue,
+                                  snackPosition: SnackPosition.BOTTOM,
+                                  duration: Duration(seconds: 3),
+                                );
+                                // ScaffoldMessenger.of(context).showSnackBar(
+                                //   SnackBar(
+                                //     content: Text(StringUtils.overlapDateError),
+                                //     backgroundColor: ColorUtils.blue,
+                                //     duration: Duration(seconds: 3),
+                                //     behavior: SnackBarBehavior.floating,
+                                //   ),
+                                // );
+                                return;
+                              }
+                              setState(() => isLoading = true);
+                              ReservationModel newReservation =
+                                  ReservationModel(
+                                      userId: 1,
+                                      // Replace with actual user ID logic
+                                      checkin: checkinController.text,
+                                      checkout: checkoutController.text,
+                                      fullname: fullnameController.text,
+                                      phone: phoneController.text,
+                                      email: emailController.text,
+                                      adult: adultCount,
+                                      child: childCount,
+                                      pet: petCount,
+                                      ratePerNight:
+                                          double.parse(rateController.text),
+                                      subtotal: subtotal,
+                                      discount:
+                                          double.parse(discountController.text),
+                                      taxPercent: double.parse(
+                                          taxPercentController.text),
+                                      tax: tax,
+                                      grandTotal: grandTotal,
+                                      prepayment: double.parse(
+                                          prepaymentController.text),
+                                      balance: balance,
+                                      roomId: selectedRoom?.id ?? 0,
+                                      roomName: selectedRoom?.roomName ?? "",
+                                      rooms: selectedRoomsList);
 
-                        if (reservation == null) {
-                          context
-                              .read<ReservationBloc>()
-                              .add(AddReservationEvent(newReservation));
-                        } else {
-                          newReservation.id = reservation?.id ?? 0;
-                          context.read<ReservationBloc>().add(
-                              UpdateReservationEvent(newReservation));
-                        }
-                        Navigator.pop(context, newReservation);
-                        if (mounted) {
-                          setState(() => isLoading = false);
-                        }
-                        context
-                            .read<ReservationBloc>()
-                            .add(FetchReservationsEvent());
-                      }
-                    },
+                              if (reservation == null) {
+                                context
+                                    .read<ReservationBloc>()
+                                    .add(AddReservationEvent(newReservation));
+                              } else {
+                                newReservation.id = reservation?.id ?? 0;
+                                context.read<ReservationBloc>().add(
+                                    UpdateReservationEvent(newReservation));
+                              }
+                              Navigator.pop(context, newReservation);
+                              // final GlobalKey<CalendarScreenState> calendarKey =
+                              //     GlobalKey<CalendarScreenState>();
+                              // calendarKey.currentState
+                              //     ?.scrollToToday(animate: false);
+                              if (mounted) {
+                                setState(() => isLoading = false);
+                              }
+                              context
+                                  .read<ReservationBloc>()
+                                  .add(FetchReservationsEvent());
+                            }
+                          },
                     child: isLoading
                         ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        color: ColorUtils.white,
-                        strokeWidth: 2,
-                      ),
-                    )
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: ColorUtils.white,
+                              strokeWidth: 2,
+                            ),
+                          )
                         : Text(reservation == null
-                        ? StringUtils.addReservation
-                        : StringUtils.updateReservation),
+                            ? StringUtils.addReservation
+                            : StringUtils.updateReservation),
                   ),
                   SizedBox(
                     height: 25,
@@ -1242,7 +1336,7 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
 
   void roomDialog(BuildContext context, VoidCallback onTap) {
     List<RoomModel> selectedDialogRoom =
-    List.from(selectedRoomsList); // Create a copy
+        List.from(selectedRoomsList); // Create a copy
 
     showDialog(
       context: context,
@@ -1264,7 +1358,7 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
                           mainAxisSize: MainAxisSize.min,
                           children: state.rooms.map((e) {
                             final isSelected =
-                            selectedDialogRoom.any((r) => r.id == e.id);
+                                selectedDialogRoom.any((r) => r.id == e.id);
                             return ListTile(
                               onTap: () {
                                 dialogSetState(() {
@@ -1357,7 +1451,7 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
         controller: controller,
         keyboardType: keyboardType,
         decoration:
-        InputDecoration(labelText: label, border: OutlineInputBorder()),
+            InputDecoration(labelText: label, border: OutlineInputBorder()),
         validator: validator,
       ),
     );
@@ -1365,12 +1459,21 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
 
   /// ✅ Counter Widget
   Widget _buildCounter(String label, int count) {
+    final double textSize = Get.width * 0.04; // thoda compact
+
     return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(label,
-            style: TextStyle(
-                fontSize: Get.width * 0.042, fontWeight: FontWeight.bold)),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
               onPressed: () {
@@ -1384,10 +1487,15 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
                   }
                 });
               },
-              icon: Icon(Icons.remove_circle_outline, color: ColorUtils.red),
+              icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+              iconSize: 20,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
             ),
-            Text(count.toString(),
-                style: TextStyle(fontSize: Get.width * 0.042)),
+            const SizedBox(width: 6),
+            Text(count.toString(), style: TextStyle(fontSize: textSize)),
+            const SizedBox(width: 6),
             IconButton(
               onPressed: () {
                 setState(() {
@@ -1400,7 +1508,11 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
                   }
                 });
               },
-              icon: Icon(Icons.add_circle_outline, color: ColorUtils.green),
+              icon: const Icon(Icons.add_circle_outline, color: Colors.green),
+              iconSize: 20,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
             ),
           ],
         ),
@@ -1410,11 +1522,11 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
 
   /// ✅ Summary Row Widget
   Widget _buildSummaryRow(
-      String label,
-      double value, {
-        bool isBold = false,
-        Color color = ColorUtils.black,
-      }) {
+    String label,
+    double value, {
+    bool isBold = false,
+    Color color = ColorUtils.black,
+  }) {
     // Detect prepayment
     final bool isPrepayment = label.toLowerCase().contains('prepayment');
 
@@ -1431,12 +1543,14 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              color: displayColor,
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                color: displayColor,
+              ),
             ),
           ),
           Text(

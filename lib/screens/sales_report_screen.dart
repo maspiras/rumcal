@@ -122,20 +122,24 @@ class _ReportScreenState extends State<ReportScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      entry.key,
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: ColorUtils.blue,
+                                    Expanded(
+                                      child: Text(
+                                        entry.key,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: ColorUtils.blue,
+                                        ),
                                       ),
                                     ),
-                                    Text(
-                                      "\$ ${groupTotal.toStringAsFixed(2)}",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blue,
+                                    Expanded(
+                                      child: Text(
+                                        "\$ ${groupTotal.toStringAsFixed(2)}",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.blue,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -150,17 +154,23 @@ class _ReportScreenState extends State<ReportScreen> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        item['date'],
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                      Text(
-                                        "\$ ${item['amount'].toStringAsFixed(2)}",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                          color: Colors.green[700],
+                                      Expanded(
+                                        child: Text(
+                                          item['date'],
+                                          style: const TextStyle(fontSize: 16),
                                         ),
+                                      ),
+                                      Column(
+                                        children: [
+                                          Text(
+                                            "\$ ${item['amount'].toStringAsFixed(2)}",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: Colors.green[700],
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),

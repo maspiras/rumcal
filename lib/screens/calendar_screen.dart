@@ -1884,10 +1884,12 @@ class CalendarScreenState extends State<CalendarScreen> {
   DateTime selectedMonth = DateTime.now();
   DateTime calenderCenterDate = DateTime.now();
   List<DateTime> calenderDates = [];
-
+  final GlobalKey<CalendarScreenState> calendarKey =
+      GlobalKey<CalendarScreenState>();
   static bool _dataFetched = false;
   static String? _currentUserId;
   bool _shouldShowLoader = false;
+  bool _pendingScrollToToday = false;
 
   @override
   void initState() {
@@ -1963,6 +1965,7 @@ class CalendarScreenState extends State<CalendarScreen> {
       _currentUserId = currentUserId;
       _dataFetched = false;
       _shouldShowLoader = widget.fromLogin;
+      calendarKey.currentState?.scrollToToday(animate: false);
       await _initialize();
     } else {
       _shouldShowLoader = false;
@@ -2050,7 +2053,18 @@ class CalendarScreenState extends State<CalendarScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Calendar')),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => chooseAddCalendarBottomSheet(context),
+        // onPressed: () => chooseAddCalendarBottomSheet(context),
+        onPressed: () {
+          chooseAddCalendarBottomSheet(
+            context,
+            onReservationAdded: () {
+              // try immediately…
+              scrollToToday(animate: false);
+              // …and mark a pending scroll in case Bloc rebuilds after fetch
+              setState(() => _pendingScrollToToday = true);
+            },
+          );
+        },
         child: const Icon(Icons.add),
       ),
       body: isLoading
@@ -2093,6 +2107,14 @@ class CalendarScreenState extends State<CalendarScreen> {
                     final todayIndex = calenderDates.indexWhere((d) =>
                         DateFormat("yyyy-MM-dd").format(d) ==
                         DateFormat("yyyy-MM-dd").format(DateTime.now()));
+
+                    // ⬇️⬇️ INSERT THIS BLOCK HERE ⬇️⬇️
+                    if (_pendingScrollToToday) {
+                      _pendingScrollToToday = false;
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        scrollToToday(animate: false);
+                      });
+                    }
 
                     return Column(
                       children: [
@@ -2183,6 +2205,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                         // ── Body (V+H synced)
                         Expanded(
                           child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // LEFT: Rooms with right vertical grid line & band lines
                               SizedBox(

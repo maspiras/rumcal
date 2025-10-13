@@ -379,16 +379,20 @@ class ReservationCardView extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
+          Expanded(
+            child: Text(label,
+                style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+          ),
+          Expanded(
+            child: Text(
+              strValue ?? "\$${value.toStringAsFixed(2)}",
               style: TextStyle(
-                  fontSize: 14.5,
-                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
-          Text(
-            strValue ?? "\$${value.toStringAsFixed(2)}",
-            style: TextStyle(
-              fontSize: 14.5,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              color: color,
+                fontSize: 14.5,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                color: color,
+              ),
             ),
           ),
         ],

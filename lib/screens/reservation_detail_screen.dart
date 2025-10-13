@@ -162,7 +162,7 @@ class _ReservationDetailScreenState extends State<ReservationDetailScreen> {
         children: [
           Icon(icon, size: 20, color: ColorUtils.grey),
           SizedBox(width: 8),
-          Text(text, style: TextStyle(fontSize: 18)),
+          Expanded(child: Text(text, style: TextStyle(fontSize: 18))),
         ],
       ),
     );
@@ -194,16 +194,20 @@ class _ReservationDetailScreenState extends State<ReservationDetailScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
+          Expanded(
+            child: Text(label,
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+          ),
+          Expanded(
+            child: Text(
+              "\$${amount.toStringAsFixed(2)}",
               style: TextStyle(
                   fontSize: 18,
-                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
-          Text(
-            "\$${amount.toStringAsFixed(2)}",
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-                color: color),
+                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                  color: color),
+            ),
           ),
         ],
       ),

@@ -384,6 +384,8 @@ class _UserScreenState extends State<UserScreen> {
                         SizedBox(height: 10),
                         DropdownButtonFormField(
                           value: selectedRole,
+                          isExpanded: true, // ✅ prevents horizontal overflow
+                          isDense: true,
                           validator: (value) => (value?.isEmpty ?? true)
                               ? StringUtils.required
                               : null,
