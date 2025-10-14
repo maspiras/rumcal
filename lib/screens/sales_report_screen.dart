@@ -163,7 +163,7 @@ class _ReportScreenState extends State<ReportScreen> {
                                       Column(
                                         children: [
                                           Text(
-                                            "\$ ${item['amount'].toStringAsFixed(2)}",
+                                            " ${item['amount'].toStringAsFixed(2)}",
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16,

@@ -257,7 +257,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
       }
 
       String fullname = item.fullname;
-      int maxLength = 20;
+      int maxLength = 12;
 
       if (fullname.length > maxLength) {
         int lastIndex = fullname.lastIndexOf(' ', maxLength);
