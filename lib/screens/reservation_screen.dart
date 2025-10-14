@@ -275,7 +275,7 @@ class _ReservationScreenState extends State<ReservationScreen>
     final currentTab = tabLabels[_tabController.index];
 
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         title: Text(StringUtils.reservations),
         bottom: TabBar(
           controller: _tabController,
@@ -286,7 +286,7 @@ class _ReservationScreenState extends State<ReservationScreen>
           unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
           tabs: tabLabels.map((label) => Tab(text: label)).toList(),
         ),
-      ),
+      ),*/
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await addEditReservationBottomSheet(context);
@@ -296,6 +296,19 @@ class _ReservationScreenState extends State<ReservationScreen>
       ),
       body: Column(
         children: [
+          Material(
+            color: Colors.brown,
+            child: TabBar(
+              controller: _tabController,
+              indicatorColor: ColorUtils.white,
+              labelColor: ColorUtils.white,
+              unselectedLabelColor: ColorUtils.white70,
+              labelStyle: TextStyle(fontWeight: FontWeight.bold),
+              unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+              tabs: tabLabels.map((label) => Tab(text: label)).toList(),
+            ),
+          ),
+
           if (currentTab != StringUtils.current)
             Padding(
               padding: EdgeInsets.all(8),

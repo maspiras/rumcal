@@ -2051,7 +2051,7 @@ class CalendarScreenState extends State<CalendarScreen> {
     const double topLead = kRowGap / 2;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Calendar')),
+      //appBar: AppBar(title: const Text('Calendar')),
       floatingActionButton: FloatingActionButton(
         // onPressed: () => chooseAddCalendarBottomSheet(context),
         onPressed: () {

@@ -10,5 +10,6 @@ class ColorUtils{
   static const green = Colors.green;
   static const grey = Colors.grey;
   static const black = Colors.black;
+  static const brown = Colors.brown;
   // static const Color primary = Color(0xff00CED1);
 }
