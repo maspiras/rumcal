@@ -296,7 +296,9 @@ Future<dynamic> addEditRoomBottomSheet(BuildContext context,
                 Text(
                   room == null ? StringUtils.addRoom : StringUtils.editRoom,
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 TextFormField(

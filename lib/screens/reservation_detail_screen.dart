@@ -1,5 +1,5 @@
-// ignore_for_file: must_be_immutable
-import '/utils/color_utils.dart';
+// ignore_for_file: must_be_immutable, deprecated_member_use
+/*import '/utils/color_utils.dart';
 import '/utils/string_utils.dart';
 import '/widgets/add_edit_reservation_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +16,8 @@ class ReservationDetailScreen extends StatefulWidget {
 }
 
 class _ReservationDetailScreenState extends State<ReservationDetailScreen> {
+  bool _edited = false; // <-- add this
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -685,4 +687,238 @@ class _ReservationDetailScreenState extends State<ReservationDetailScreen> {
   //     ),
   //   );
   // }
+}*/
+
+import '/utils/color_utils.dart';
+import '/utils/string_utils.dart';
+import '/widgets/add_edit_reservation_bottom_sheet.dart';
+import 'package:flutter/material.dart';
+import '/model/reservation_model.dart';
+
+class ReservationDetailScreen extends StatefulWidget {
+  ReservationModel reservation;
+
+  ReservationDetailScreen({super.key, required this.reservation});
+
+  @override
+  State<ReservationDetailScreen> createState() =>
+      _ReservationDetailScreenState();
+}
+
+class _ReservationDetailScreenState extends State<ReservationDetailScreen> {
+  bool _edited = false; // <-- track if anything was saved/updated
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      // Always return whether anything changed on this screen
+      onWillPop: () async {
+        Navigator.pop(context, _edited);
+        return false; // prevent default pop; we've handled it
+      },
+      child: Scaffold(
+        appBar: AppBar(title: Text(StringUtils.reservationDetails)),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text(
+                    widget.reservation.fullname,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                _buildInfoRow(Icons.phone,
+                    "${StringUtils.phoneLabel}: ${widget.reservation.phone}"),
+                _buildInfoRow(Icons.email,
+                    "${StringUtils.emailLabel}: ${widget.reservation.email}"),
+                _buildInfoRow(Icons.calendar_today,
+                    "${StringUtils.checkIn}: ${widget.reservation.checkin}"),
+                _buildInfoRow(Icons.calendar_today,
+                    "${StringUtils.checkOut}: ${widget.reservation.checkout}"),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildGuestCount(Icons.person, StringUtils.adults,
+                        widget.reservation.adult),
+                    _buildGuestCount(Icons.child_care, StringUtils.children,
+                        widget.reservation.child),
+                    _buildGuestCount(
+                        Icons.pets, StringUtils.pets, widget.reservation.pet),
+                  ],
+                ),
+                const Divider(thickness: 1, height: 24),
+                _buildPriceRow(
+                    StringUtils.ratePerNight, widget.reservation.ratePerNight),
+                _buildPriceRow(
+                    StringUtils.subtotal, widget.reservation.subtotal),
+                _buildPriceRow(StringUtils.tax, widget.reservation.tax),
+                _buildPriceRow(
+                    StringUtils.discount, widget.reservation.discount),
+                _buildPriceRow(
+                  StringUtils.grandTotal,
+                  widget.reservation.grandTotal,
+                  isBold: true,
+                ),
+                _buildPriceRow(
+                    StringUtils.prepayment, widget.reservation.prepayment),
+                _buildPriceRow(
+                  StringUtils.balance,
+                  widget.reservation.balance,
+                  isBold: true,
+                  color: ColorUtils.red,
+                ),
+                const SizedBox(height: 50),
+                Center(
+                  child: Row(
+                    children: [
+                      // BACK
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            // Return whether edits happened
+                            Navigator.pop(context, _edited);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              border:
+                                  Border.all(color: ColorUtils.grey, width: 1),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Center(
+                                child: Text(
+                                  StringUtils.back,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 30),
+
+                      // EDIT
+                      Expanded(
+                        child: InkWell(
+                          onTap: () async {
+                            final result = await addEditReservationBottomSheet(
+                              context,
+                              reservation: widget.reservation,
+                            );
+                            if (result != null) {
+                              setState(() {
+                                widget.reservation = result;
+                                _edited = true; // <-- mark change
+                              });
+                            }
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: ColorUtils.blue,
+                              borderRadius: BorderRadius.circular(30),
+                              border:
+                                  Border.all(color: ColorUtils.grey, width: 1),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Center(
+                                child: Text(
+                                  StringUtils.edit,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorUtils.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: ColorUtils.grey),
+          const SizedBox(width: 8),
+          Expanded(child: Text(text, style: const TextStyle(fontSize: 18))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGuestCount(IconData icon, String label, int count) {
+    return Expanded(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 25, color: ColorUtils.blue),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              "$label: $count",
+              style: const TextStyle(fontSize: 18),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriceRow(String label, double amount,
+      {bool isBold = false, Color? color}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              "\$${amount.toStringAsFixed(2)}",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                color: color,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

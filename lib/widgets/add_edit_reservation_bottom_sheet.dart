@@ -1321,9 +1321,7 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
                             ? StringUtils.addReservation
                             : StringUtils.updateReservation),
                   ),
-                  SizedBox(
-                    height: 25,
-                  )
+                  SizedBox(height: 25)
                 ],
               ),
             ),

@@ -1,4 +1,4 @@
-// ignore_for_file: dangling_library_doc_comments
+// ignore_for_file: dangling_library_doc_comments, use_build_context_synchronously
 
 /*
 // ignore_for_file: library_private_types_in_public_api, avoid_function_literals_in_foreach_calls, curly_braces_in_flow_control_structures, deprecated_member_use, unnecessary_to_list_in_spreads, unused_local_variable
@@ -1828,6 +1828,8 @@ class _SpacedGridPainter extends CustomPainter {
       old.lineColor != lineColor ||
       old.lineWidth != lineWidth;
 }*/
+import 'package:bookcomfy/widgets/add_edit_room_bottom_sheet.dart';
+
 import '/blocs/reservation/reservation__bloc.dart';
 import '/blocs/reservation/reservation__event.dart';
 import '/blocs/reservation/reservation__state.dart';
@@ -2241,22 +2243,50 @@ class CalendarScreenState extends State<CalendarScreen> {
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       vertical: kRowGap / 2),
-                                              child: Container(
-                                                height: kRowHeight,
-                                                alignment: Alignment.center,
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0xFF967969),
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                ),
-                                                child: Text(
-                                                  room.roomName,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 16),
+                                              child: InkWell(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                                onTap: () async {
+                                                  final changed =
+                                                      await addEditRoomBottomSheet(
+                                                          context,
+                                                          room: room);
+
+                                                  if (changed == true &&
+                                                      mounted) {
+                                                    // try immediately (in case controllers are already attached)
+                                                    scrollToToday(
+                                                        animate: false);
+
+                                                    // and mark a pending scroll for after Bloc rebuild
+                                                    setState(() =>
+                                                        _pendingScrollToToday =
+                                                            true);
+
+                                                    // now refresh rooms – this will trigger a rebuild
+                                                    context
+                                                        .read<RoomBloc>()
+                                                        .add(FetchRooms());
+                                                  }
+                                                },
+                                                child: Container(
+                                                  height: kRowHeight,
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        const Color(0xFF967969),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
+                                                  child: Text(
+                                                    room.roomName,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16),
+                                                  ),
                                                 ),
                                               ),
                                             );
@@ -2306,7 +2336,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                                           ...reservations
                                               .where((r) => r.roomId != 0)
                                               .map((r) {
-                                            final start =
+                                            /* final start =
                                                 calenderDates.indexWhere(
                                               (d) =>
                                                   DateFormat('yyyy-MM-dd')
@@ -2343,14 +2373,86 @@ class CalendarScreenState extends State<CalendarScreen> {
                                             final double height = isFirstRow
                                                 ? (kRowHeight + kGridStroke)
                                                 : (kRowHeight + kGridStroke) +
+                                                    kRowGap;*/
+                                            // find start day index
+                                            final startIdx =
+                                                calenderDates.indexWhere(
+                                              (d) =>
+                                                  DateFormat('yyyy-MM-dd')
+                                                      .format(d) ==
+                                                  r.checkin,
+                                            );
+                                            if (startIdx == -1) {
+                                              return const SizedBox.shrink();
+                                            }
+
+// compute number of nights (days between check-in and check-out)
+                                            final span = DateTime.parse(
+                                                    r.checkout)
+                                                .difference(
+                                                    DateTime.parse(r.checkin))
+                                                .inDays;
+                                            if (span <= 0) {
+                                              return const SizedBox
+                                                  .shrink(); // safety, though you already validate
+                                            }
+
+// end day index = start + span
+                                            final endIdx = startIdx + span;
+
+// vertical row placement (unchanged)
+                                            final rowIndex = rooms.indexWhere(
+                                                (rm) => rm.id == r.roomId);
+                                            if (rowIndex == -1) {
+                                              return const SizedBox.shrink();
+                                            }
+
+                                            final double bandTop =
+                                                rowIndex * kRowPitch +
+                                                    (kRowGap / 2);
+                                            final bool isFirstRow =
+                                                rowIndex == 0;
+
+                                            final double top = isFirstRow
+                                                ? (bandTop - kGridStroke / 2)
+                                                : (bandTop - kGridStroke / 2) -
                                                     kRowGap;
 
+                                            final double height = isFirstRow
+                                                ? (kRowHeight + kGridStroke)
+                                                : (kRowHeight + kGridStroke) +
+                                                    kRowGap;
+
+// ⬇️ NEW: draw from middle of start day to middle of end day
+                                            final double startMidX =
+                                                startIdx * kCellWidth +
+                                                    (kCellWidth / 2);
+                                            final double endMidX =
+                                                endIdx * kCellWidth +
+                                                    (kCellWidth / 2);
+
+// width becomes `span * kCellWidth` (no +1)
+// Now consecutive bookings 14–15 and 15–16 just touch at day 15 mid.
+
                                             return Positioned(
-                                              left: start * kCellWidth,
+                                              // left: start * kCellWidth,
+                                              left: startMidX,
                                               top: top,
                                               child: GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
+                                                // onTap: () {
+                                                //   Navigator.push(
+                                                //     context,
+                                                //     MaterialPageRoute(
+                                                //       builder: (_) =>
+                                                //           ReservationDetailScreen(
+                                                //               reservation: r),
+                                                //     ),
+                                                //   );
+                                                // },
+                                                onTap: () async {
+                                                  final didChange =
+                                                      await Navigator.push<
+                                                          bool>(
                                                     context,
                                                     MaterialPageRoute(
                                                       builder: (_) =>
@@ -2358,11 +2460,25 @@ class CalendarScreenState extends State<CalendarScreen> {
                                                               reservation: r),
                                                     ),
                                                   );
+
+                                                  if (didChange == true) {
+                                                    // keep calendar centered on today after coming back
+                                                    scrollToToday(
+                                                        animate: false);
+                                                    if (mounted) {
+                                                      setState(() =>
+                                                          _pendingScrollToToday =
+                                                              true);
+                                                    }
+                                                  }
                                                 },
+
                                                 child: Container(
                                                   height: height,
-                                                  width:
-                                                      (span + 1) * kCellWidth,
+                                                  // width:
+                                                  //     (span + 1) * kCellWidth,
+                                                  width: endMidX -
+                                                      startMidX, // == span * kCellWidth
                                                   alignment: Alignment.center,
                                                   padding: const EdgeInsets
                                                       .symmetric(horizontal: 6),
