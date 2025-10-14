@@ -1133,7 +1133,8 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
                   ),
                   _buildTextField(
                     taxPercentController,
-                    "${StringUtils.tax} %",
+                    //"${StringUtils.tax} %",
+                    StringUtils.tax,
                     keyboardType: TextInputType.number,
                     validator: (value) =>
                         value!.isEmpty ? "Enter tax percentage" : null,
@@ -1530,8 +1531,10 @@ class _AddEditReservationWidgetState extends State<AddEditReservationWidget> {
 
     // Format value (negative for prepayment)
     final String displayValue = isPrepayment
-        ? "- \$${value.toStringAsFixed(2)}"
-        : "\$${value.toStringAsFixed(2)}";
+        /*? "- \$${value.toStringAsFixed(2)}"
+        : "\$${value.toStringAsFixed(2)}";*/
+        ? "- ${value.toStringAsFixed(2)}"
+        : value.toStringAsFixed(2);
 
     // Optional: make prepayment text red automatically
     final Color displayColor = isPrepayment ? Colors.red : color;
