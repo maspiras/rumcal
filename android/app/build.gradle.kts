@@ -10,6 +10,11 @@ dependencies {
     implementation("com.google.android.material:material:1.13.0")
     // ...
 }
+
+//def keystorePropertiesFile = rootProject.file("../key.properties")
+//def keystoreProperties = new Properties()
+//keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
     namespace = "com.elyutech.bookcomfy"
     compileSdk = flutter.compileSdkVersion
@@ -34,6 +39,15 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
+
+//    signingConfigs {
+//        release {
+//            storeFile file(keystoreProperties['storeFile'])
+//            storePassword keystoreProperties['storePassword']
+//            keyAlias keystoreProperties['keyAlias']
+//            keyPassword keystoreProperties['keyPassword']
+//        }
+//    }
 
     buildTypes {
         release {
